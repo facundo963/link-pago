@@ -1,0 +1,27 @@
+{
+  "name": "link-pago",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/src/app.js",
+    "dev": "nodemon server/src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.19.1",
+    "nanoid": "^5.1.6",
+    "nanoid-good": "^3.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.38.0",
+    "nodemon": "^3.1.10"
+  }
+}

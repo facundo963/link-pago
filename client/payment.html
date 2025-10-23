@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Pago</title>
+  </head>
+  <body>
+    <div id="root">Cargando...</div>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const order = params.get('order');
+
+      if (!order) {
+        document.getElementById('root').innerText = '⚠️ Falta el parámetro "order" en la URL';
+      } else {
+        fetch('/api/payments/' + order)
+          .then(r => r.json())
+          .then(p => {
+            if (!p || p.error) {
+              document.getElementById('root').innerText = '❌ Pago no encontrado';
+              return;
+            }
+
+            // Color según estado
+            let color = 'black';
+            if (p.status === 'completado') color = 'green';
+            else if (p.status === 'vencido') color = 'red';
+            else if (p.status === 'faltante') color = 'orange';
+            else if (p.status === 'sobrante') color = 'blue';
+            else color = 'gray';
+
+            // Render
+            document.getElementById('root').innerHTML = `
+              <h2>${p.description || 'Pago'}</h2>
+              <p>Monto: $${p.amount}</p>
+              <p>Estado: <span style="color:${color};font-weight:bold;">${p.status}</span></p>
+              <p>Vence: ${p.expiresAt ? new Date(p.expiresAt).toLocaleString() : '—'}</p>
+              ${
+                p.status === 'pendiente'
+                  ? '<button id="paid">Ya hice el pago</button>'
+                  : '<p> Este pago ya no se puede modificar</p>'
+              }
+            `;
+
+            const paidBtn = document.getElementById('paid');
+            if (paidBtn) {
+              paidBtn.onclick = async () => {
+                await fetch('/api/payments/' + order + '/status', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ status: 'completado' })
+                });
+                alert('✅ Pago marcado como completado');
+                location.reload();
+              };
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            document.getElementById('root').innerText = '❌ Error al cargar el pago';
+          });
+      }
+    </script>
+  </body>
+</html>

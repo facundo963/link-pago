@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>Panel de Cobros</title>
+    <style>
+      body { font-family: sans-serif; padding: 20px; }
+      table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+      th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+      th { background: #f2f2f2; }
+      input, button { margin: 5px; padding: 5px; }
+      #form { margin-top: 15px; }
+    </style>
+  </head>
+
+  <body>
+    <h1>Panel de cobros</h1>
+    <button id="new">+ Crear link de pago</button>
+
+    <div id="form" style="display:none;">
+      <input id="amount" placeholder="Monto">
+      <input id="desc" placeholder="Descripción">
+      <input id="email" placeholder="Email cliente (opcional)">
+      <input id="hours" placeholder="Vence en (hs)">
+      <button id="create">Confirmar</button>
+    </div>
+
+    <table id="list"></table>
+
+    <script>
+      const API = '/api/payments';
+
+      // Mostrar formulario
+      document.getElementById('new').onclick = () => {
+        document.getElementById('form').style.display = 'block';
+      };
+
+      // Crear nuevo link
+      document.getElementById('create').onclick = async () => {
+        const amount = parseFloat(document.getElementById('amount').value);
+        const desc = document.getElementById('desc').value;
+        const email = document.getElementById('email').value;
+        const hours = parseInt(document.getElementById('hours').value) || 1;
+
+        if (!amount || !desc) {
+          alert('Por favor completá monto y descripción.');
+          return;
+        }
+
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount,
+            description: desc,
+            customerEmail: email,
+            expiresInHours: hours
+          })
+        });
+
+        const json = await res.json();
+        if (!json.orderId) {
+          alert('⚠️ Error al crear link');
+          return;
+        }
+
+        // ✅ link corregido sin /client/
+        const paymentUrl = `${window.location.origin}/payment.html?order=${json.orderId}`;
+        alert('Link creado: ' + paymentUrl);
+        loadList();
+      };
+
+      // Cargar lista de pagos
+      async function loadList() {
+        const res = await fetch(API + '/all');
+        const arr = await res.json();
+
+        const table = document.getElementById('list');
+        table.innerHTML = '<tr><th>ID</th><th>Monto</th><th>Estado</th><th>Link</th></tr>';
+
+        arr.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${p.orderId}</td>
+            <td>$${p.amount}</td>
+            <td>${p.status}</td>
+            <td><a href="/payment.html?order=${p.orderId}" target="_blank">Ver</a></td>
+          `;
+          table.appendChild(tr);
+        });
+      }
+
+      loadList();
+    </script>
+  </body>
+</html>
