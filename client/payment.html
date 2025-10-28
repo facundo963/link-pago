@@ -1,66 +1,296 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Pago</title>
-  </head>
-  <body>
-    <div id="root">Cargando...</div>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Pago - Link de Pago</title>
+  <style>
+    /* === RESET === */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #dcdde1;
+      margin: 0;
+      padding: 40px;
+    }
 
-    <script>
-      const params = new URLSearchParams(location.search);
-      const order = params.get('order');
+    h2 {
+      margin-top: 0;
+      color: #2f3640;
+      text-align: left;
+    }
 
-      if (!order) {
-        document.getElementById('root').innerText = '⚠️ Falta el parámetro "order" en la URL';
-      } else {
-        fetch('/api/payments/' + order)
-          .then(r => r.json())
-          .then(p => {
-            if (!p || p.error) {
-              document.getElementById('root').innerText = '❌ Pago no encontrado';
-              return;
-            }
+    /* === CONTENEDORES === */
+    .container {
+      background: #e0e0e0;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      gap: 30px;
+    }
 
-            // Color según estado
-            let color = 'black';
-            if (p.status === 'completado') color = 'green';
-            else if (p.status === 'vencido') color = 'red';
-            else if (p.status === 'faltante') color = 'orange';
-            else if (p.status === 'sobrante') color = 'blue';
-            else color = 'gray';
+    .box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f1f2f6;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 25px;
+    }
 
-            // Render
-            document.getElementById('root').innerHTML = `
-              <h2>${p.description || 'Pago'}</h2>
-              <p>Monto: $${p.amount}</p>
-              <p>Estado: <span style="color:${color};font-weight:bold;">${p.status}</span></p>
-              <p>Vence: ${p.expiresAt ? new Date(p.expiresAt).toLocaleString() : '—'}</p>
-              ${
-                p.status === 'pendiente'
-                  ? '<button id="paid">Ya hice el pago</button>'
-                  : '<p> Este pago ya no se puede modificar</p>'
-              }
-            `;
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-            const paidBtn = document.getElementById('paid');
-            if (paidBtn) {
-              paidBtn.onclick = async () => {
-                await fetch('/api/payments/' + order + '/status', {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ status: 'completado' })
-                });
-                alert('✅ Pago marcado como completado');
-                location.reload();
-              };
-            }
-          })
-          .catch(err => {
-            console.error(err);
-            document.getElementById('root').innerText = '❌ Error al cargar el pago';
+    /* === DATOS === */
+    .label {
+      font-weight: 600;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    .value {
+      background: #dfe4ea;
+      padding: 8px 14px;
+      border-radius: 20px;
+      margin-top: 5px;
+    }
+
+    /* === ALERTA === */
+    .warning {
+      border: 2px dashed #e84118;
+      background: #fff5f5;
+      color: #c23616;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      position: relative;
+    }
+
+    .warning::before {
+      content: "⚠️";
+      font-size: 23px;
+      position: absolute;
+      left: -14px;
+      top: -13px;
+    }
+
+    /* === ALIAS / CVU BOX === */
+    .copy-box {
+      border: 2px dashed #4b4b8f;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-size: 15px;
+      color: #2f3640;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbff;
+    }
+
+    .copy-btn {
+      border: none;
+      background: none;
+      color: #e84118;
+      font-size: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .copy-btn:hover {
+      color: #c0392b;
+      transform: scale(1.1);
+    }
+
+    /* === BOTÓN PRINCIPAL === */
+    .btn-pago {
+      background: #636e72;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      margin-top: 30px;
+      align-self: center;
+      width: 80%;
+}
+    
+
+    .btn-pago:hover {
+      background: #2d3436;
+    }
+
+    /* === CONFIRMADO === */
+    .confirmado {
+      background: #dcdde1;
+      border: 1px solid #444;
+      border-radius: 8px;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .confirmado h2 {
+      margin: 0 0 8px 0;
+      color: #2f3640;
+    }
+
+  
+    .check {
+          width: 60px;
+          height: 60px;
+          background: #22c55e;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 34px;
+          color: #fff;
+          margin: 8px auto 10px auto
+          }
+
+    .grid-datos {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 10px 16px;
+      align-items: center;
+      text-align: left;
+      margin: 0 auto;
+      max-width: 600px;
+    }
+
+    .dato {
+      background: #eef2f7;
+      border-radius: 18px;
+      padding: 8px 14px;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: #555;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Hace tu pago</h2>
+
+  <div class="container" id="content">
+    <div class="box">
+      <div class="label">Datos de tu pago</div>
+
+      <div class="label">Monto</div>
+      <div class="value" id="monto">$—</div>
+
+      <div class="label">Referencia del pago</div>
+      <div class="value" id="desc">—</div>
+
+      <div class="label">Vencimiento</div>
+      <div class="value" id="vence">—</div>
+
+      <div class="label">Titular del pago</div>
+      <div class="value" id="titular">—</div>
+
+      <div class="label">Email cliente (opcional)</div>
+      <small style="color:#555;">Para enviar confirmación de pago</small>
+      <div class="value" id="email">—</div>
+
+      <div class="label">ID Orden</div>
+      <div class="value" id="orden">—</div>
+
+      <button class="btn-pago" id="paid">Ya hice el pago</button>
+    </div>
+
+    <div class="right">
+      <div class="warning">
+        <b>Cuidado</b><br>
+        Los datos de pago son exclusivos para esta orden de compra.<br>
+        No intentes volver a usarlos para otra compra.
+      </div>
+
+      <div class="copy-box">
+        <span><b>ALIAS:</b> <span id="alias">---</span></span>
+        <button class="copy-btn" data-target="alias">📋</button>
+      </div>
+
+      <div class="copy-box">
+        <span><b>CVU:</b> <span id="cvu">---</span></span>
+        <button class="copy-btn" data-target="cvu">📋</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const order = params.get("order");
+
+    if (!order) {
+      document.body.innerHTML = "<h3>Falta el parámetro 'order'</h3>";
+    } else {
+      fetch(`/api/payments/${order}`)
+        .then(r => r.json())
+        .then(p => {
+          if (!p || p.error) {
+            document.body.innerHTML = "<h3>Pago no encontrado</h3>";
+            return;
+          }
+
+          // Asignar datos
+          document.getElementById("monto").textContent = `$${p.amount}`;
+          document.getElementById("desc").textContent = p.description || "—";
+          document.getElementById("vence").textContent = p.expiresAt ? new Date(p.expiresAt).toLocaleString() : "—";
+          document.getElementById("titular").textContent = p.paymentInfo?.titular || "—";
+          document.getElementById("email").textContent = p.customerEmail || "—";
+          document.getElementById("orden").textContent = p.orderId;
+          document.getElementById("alias").textContent = p.paymentInfo?.alias || "1234.abc";
+          document.getElementById("cvu").textContent = p.paymentInfo?.cvu || "1234567891234567891234";
+
+          // Botón copiar
+          document.querySelectorAll(".copy-btn").forEach(btn => {
+            btn.onclick = () => {
+              const value = document.getElementById(btn.dataset.target).textContent.trim();
+              navigator.clipboard.writeText(value);
+              btn.textContent = "✅";
+              setTimeout(() => (btn.textContent = "📋"), 1500);
+            };
           });
-      }
-    </script>
-  </body>
+
+          // Botón confirmar pago
+          document.getElementById("paid").onclick = async () => {
+            await fetch(`/api/payments/${order}/status`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ status: "completado" }),
+            });
+
+            // Reemplazar por la vista de pago confirmado
+            document.body.innerHTML = `
+              <div class="confirmado">
+                <h2>Pago Confirmado</h2>
+                <div class="check">✓</div>
+                <div class="grid-datos">
+                  <div><b>Datos de tu pago</b></div><div></div>
+                  <div>Monto</div><div class="dato">$${p.amount}</div>
+                  <div>Referencia del pago</div><div class="dato">${p.description || "-"}</div>
+                  <div>Titular del pago</div><div class="dato">—</div>
+                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
+                </div>
+                <div class="footer">Gracias por tu compra.</div>
+              </div>`;
+          };
+        })
+        .catch(() => {
+          document.body.innerHTML = "<h3>Error al cargar el pago</h3>";
+        });
+    }
+  </script>
+</body>
 </html>
