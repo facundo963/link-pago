@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <title>Pago - Link de Pago</title>
@@ -10,10 +11,12 @@
       margin: 0;
       padding: 40px;
     }
+
     h2 {
       margin-top: 0;
       color: #2f3640;
     }
+
     .container {
       background: #e0e0e0;
       border-radius: 10px;
@@ -23,7 +26,9 @@
       display: flex;
       gap: 30px;
     }
-    .box, .right {
+
+    .box,
+    .right {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -33,13 +38,20 @@
       border-radius: 4px;
       padding: 25px;
     }
-    .label { font-weight: 600; color: #333; margin-top: 10px; }
+
+    .label {
+      font-weight: 600;
+      color: #333;
+      margin-top: 10px;
+    }
+
     .value {
       background: #dfe4ea;
       padding: 8px 14px;
       border-radius: 20px;
       margin-top: 5px;
     }
+
     .warning {
       border: 2px dashed #e84118;
       background: #fff5f5;
@@ -49,6 +61,7 @@
       font-size: 14px;
       position: relative;
     }
+
     .warning::before {
       content: "⚠️";
       font-size: 23px;
@@ -56,6 +69,7 @@
       left: -14px;
       top: -13px;
     }
+
     .copy-box {
       border: 2px dashed #4b4b8f;
       padding: 10px 15px;
@@ -67,6 +81,7 @@
       justify-content: space-between;
       background: #fafbff;
     }
+
     .copy-btn {
       border: none;
       background: none;
@@ -75,7 +90,12 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .copy-btn:hover { color: #c0392b; transform: scale(1.1); }
+
+    .copy-btn:hover {
+      color: #c0392b;
+      transform: scale(1.1);
+    }
+
     .btn-pago {
       background: #636e72;
       color: white;
@@ -89,7 +109,11 @@
       align-self: center;
       width: 80%;
     }
-    .btn-pago:hover { background: #2d3436; }
+
+    .btn-pago:hover {
+      background: #2d3436;
+    }
+
     .confirmado {
       background: #dcdde1;
       border: 1px solid #444;
@@ -99,13 +123,25 @@
       padding: 24px;
       text-align: center;
     }
-    .confirmado h2 { margin: 0 0 8px 0; color: #2f3640; }
-    .check {
-      width: 60px; height: 60px;
-      background: #22c55e; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 34px; color: #fff; margin: 8px auto 10px auto;
+
+    .confirmado h2 {
+      margin: 0 0 8px 0;
+      color: #2f3640;
     }
+
+    .check {
+      width: 60px;
+      height: 60px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      color: #fff;
+      margin: 8px auto 10px auto;
+    }
+
     .grid-datos {
       display: grid;
       grid-template-columns: 200px 1fr;
@@ -115,8 +151,18 @@
       margin: 0 auto;
       max-width: 600px;
     }
-    .dato { background: #eef2f7; border-radius: 18px; padding: 8px 14px; }
-    .footer { margin-top: 18px; color: #555; font-size: 14px; }
+
+    .dato {
+      background: #eef2f7;
+      border-radius: 18px;
+      padding: 8px 14px;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: #555;
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -188,6 +234,40 @@
             return;
           }
 
+          if (p.status === "rechazado") {
+            clearInterval(interval);
+            document.body.innerHTML = `
+              <div class="confirmado" style="border-color:#e84118;">
+                <h2 style="color:#c0392b;">Pago Rechazado</h2>
+                <div class="check" style="background:#e84118;">✕</div>
+                <div class="grid-datos">
+                  <div>Monto Esperado</div><div class="dato">$${p.amount}</div>
+                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
+                  <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto o error en la transferencia"}</div>
+                  </div>
+                  <div class="footer">Se devolvieron los fondos automáticamente al origen.</div>
+                  </div>`;
+            return;
+          }
+          
+
+          if (p.status === "expirado") {
+            clearInterval(interval);
+            document.body.innerHTML = `
+    <div class="confirmado" style="border-color:#999;">
+      <h2 style="color:#555;">Pago Expirado</h2>
+      <div class="check" style="background:#555;">⏰</div>
+      <div class="grid-datos">
+        <div>Monto</div><div class="dato">$${p.amount}</div>
+        <div>ID Orden</div><div class="dato">${p.orderId}</div>
+      </div>
+      <div class="footer">El link de pago venció y no se aceptan transferencias.</div>
+    </div>`;
+            return;
+          }
+
+
+
           if (p.status === "completado") {
             clearInterval(interval);
             mostrarConfirmacion(p);
@@ -236,4 +316,5 @@
     }
   </script>
 </body>
+
 </html>

@@ -4,12 +4,12 @@ const Payment = require("../models/payment");
 const crypto = require("crypto");
 const axios = require("axios");
 
-// 🔐 Configuración API Cucuru
+// Configuración API Cucuru
 const CUCURU_BASE_URL = process.env.CUCURU_BASE_URL || "https://api.cucuru.com/app/v1";
 const CUCURU_API_KEY = process.env.CUCURU_API_KEY;
 const CUCURU_COLLECTOR_ID = process.env.CUCURU_COLLECTOR_ID;
 
-// 🧩 Crear link de pago (CVU y alias personalizados)
+// Crear link de pago (CVU y alias personalizados)
 router.post("/", async (req, res) => {
   try {
     const { amount, description, customerEmail, expiresInHours } = req.body;
@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
     const aliasPersonalizado = `linkpago-${orderId}`;
     const customerId = `cliente-${orderId}`;
 
-    // 1️⃣ Crear CVU único
+    //  Crear CVU único
     let accountNumber = null;
     try {
       const cvuRes = await axios.put(
@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
       return res.status(500).json({ error: "No se pudo crear el CVU" });
     }
 
-    // 2️⃣ Asignar alias
+    // Asignar alias
     try {
       await axios.post(
         `${CUCURU_BASE_URL}/collection/accounts/account/alias`,
@@ -62,7 +62,7 @@ router.post("/", async (req, res) => {
       console.error("⚠️ Error asignando alias:", err.response?.data || err.message);
     }
 
-    // 3️⃣ Guardar en MongoDB
+    // Guardar en MongoDB
     const newPayment = new Payment({
       orderId,
       amount,
@@ -78,7 +78,7 @@ router.post("/", async (req, res) => {
     });
     await newPayment.save();
 
-    // 4️⃣ Responder al frontend
+    //  Responder al frontend
     res.status(201).json({
       orderId,
       message: "✅ Link de pago creado correctamente",
@@ -91,7 +91,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// 📋 Listar todos los pagos
+// Listar todos los pagos
 router.get("/all", async (req, res) => {
   try {
     const payments = await Payment.find().sort({ createdAt: -1 });
@@ -101,14 +101,14 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// 🔍 Obtener un pago por ID
+//  Obtener un pago por ID
 router.get("/:orderId", async (req, res) => {
   const payment = await Payment.findOne({ orderId: req.params.orderId });
   if (!payment) return res.status(404).json({ error: "Pago no encontrado" });
   res.json(payment);
 });
 
-// 🔄 Actualizar estado manualmente
+// Actualizar estado manualmente
 router.put("/:orderId/status", async (req, res) => {
   const { status, paymentInfo } = req.body;
   const payment = await Payment.findOneAndUpdate(
@@ -120,16 +120,17 @@ router.put("/:orderId/status", async (req, res) => {
   res.json({ message: "Estado actualizado", payment });
 });
 
-// 🔔 Webhook oficial Cucuru → notificación de cobro
+
+// Webhook oficial Cucuru → notificación de cobro
 router.post("/webhooks/collection_received", async (req, res) => {
-  // Responder rápido a Cucuru (HTTP 200)
+  // ✅ Responder rápido a Cucuru (HTTP 200)
   res.sendStatus(200);
 
   try {
     const data = req.body;
     console.log("💰 Cobro recibido desde Cucuru:", data);
 
-    // Buscar el pago por CVU o customer_id
+    // Buscar el pago en Mongo
     const payment = await Payment.findOne({
       $or: [
         { "paymentInfo.cvu": data.collection_account },
@@ -142,7 +143,45 @@ router.post("/webhooks/collection_received", async (req, res) => {
       return;
     }
 
-    // Actualizar estado a completado
+    //  Validar monto exacto
+    const montoEsperado = Number(payment.amount);
+    const montoRecibido = Number(data.amount);
+
+    if (Math.abs(montoEsperado - montoRecibido) > 0.0001) {
+      payment.status = "rechazado";
+      payment.motivoRechazo = `Monto incorrecto: esperado ${montoEsperado}, recibido ${montoRecibido}`;
+      await payment.save();
+
+      console.warn(
+        `❌ Monto incorrecto para pago ${payment.orderId}. Esperado: ${montoEsperado}, Recibido: ${montoRecibido}`
+      );
+
+      //  Rechazar y devolver dinero
+      try {
+        const rejectBody = {
+          collection_id: data.collection_id,
+          customer_account: data.customer_account,
+          collection_account: data.collection_account,
+        };
+
+        await axios.post(`${CUCURU_BASE_URL}/Collection/reject`, rejectBody, {
+          headers: {
+            "X-Cucuru-Api-Key": CUCURU_API_KEY,
+            "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log(`🔁 Transferencia devuelta (collection_id: ${data.collection_id})`);
+      } catch (err) {
+        console.error("❌ Error devolviendo fondos:", err.response?.data || err.message);
+      }
+
+      
+      return;
+    }
+
+    // ✅ Si el monto coincide, marcar como completado
     payment.status = "completado";
     payment.paymentInfo.origen = {
       titular: data.customer_name,
@@ -158,7 +197,8 @@ router.post("/webhooks/collection_received", async (req, res) => {
   }
 });
 
-// 🧷 Registrar webhook (solo una vez)
+
+//  Registrar webhook (solo una vez)
 router.post("/webhooks/register", async (req, res) => {
   try {
     const webhookUrl =

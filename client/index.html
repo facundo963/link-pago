@@ -111,6 +111,10 @@
       background: #e74c3c;
     }
 
+    .rechazado {
+      background: #e84118;;
+    }
+
     td.link-cell {
       position: relative;
       width: 260px;
@@ -342,6 +346,7 @@
         if (p.status === 'completado') estadoClass = 'completado';
         else if (p.status === 'vencido') estadoClass = 'vencido';
         else if (p.status === 'sobrante') estadoClass = 'sobrante';
+        else if (p.status === 'rechazado') estadoClass = 'rechazado';
         else if (p.status === 'faltante') estadoClass = 'faltante';
 
         const paymentUrl = `${window.location.origin}/payment.html?order=${p.orderId}`;
