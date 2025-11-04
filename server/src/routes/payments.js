@@ -226,7 +226,7 @@ router.post("/webhooks/register", async (req, res) => {
     console.error("❌ Error registrando webhook:", err.response?.data || err.message);
     res.status(500).json({ error: "Error registrando webhook" });
   }
-
+});
 
 
   // 🔧 Endpoint temporal para probar devolución manual desde el backend
@@ -262,9 +262,5 @@ router.post("/testReject", async (req, res) => {
   }
 });
 
-
-
-
-});
 
 module.exports = router;
