@@ -226,6 +226,45 @@ router.post("/webhooks/register", async (req, res) => {
     console.error("❌ Error registrando webhook:", err.response?.data || err.message);
     res.status(500).json({ error: "Error registrando webhook" });
   }
+
+
+
+  // 🔧 Endpoint temporal para probar devolución manual desde el backend
+router.post("/testReject", async (req, res) => {
+  try {
+    const { collection_id, customer_account, collection_account } = req.body;
+
+    if (!collection_id || !customer_account || !collection_account) {
+      return res.status(400).json({ error: "Faltan datos obligatorios" });
+    }
+
+    console.log("🚀 Intentando rechazo manual:", { collection_id, customer_account, collection_account });
+
+    const rejectBody = { collection_id, customer_account, collection_account };
+
+    const { data } = await axios.post(`${CUCURU_BASE_URL}/Collection/reject`, rejectBody, {
+      headers: {
+        "X-Cucuru-Api-Key": CUCURU_API_KEY,
+        "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("✅ Respuesta de Cucuru:", data);
+    res.json({ success: true, cucuruResponse: data });
+
+  } catch (err) {
+    console.error("❌ Error en testReject:", err.response?.data || err.message);
+    res.status(500).json({
+      error: "Fallo al intentar devolver los fondos",
+      detalle: err.response?.data || err.message,
+    });
+  }
+});
+
+
+
+
 });
 
 module.exports = router;
