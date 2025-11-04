@@ -227,6 +227,7 @@ router.post("/webhooks/register", async (req, res) => {
     res.status(500).json({ error: "Error registrando webhook" });
   }
 
+});
 
 
   //Reintentar pago rechazado
@@ -298,6 +299,6 @@ router.post("/webhooks/register", async (req, res) => {
     res.status(500).json({ error: "Error al reintentar el pago" });
   }
   });
-});
+
 
 module.exports = router;
