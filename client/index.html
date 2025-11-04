@@ -268,11 +268,20 @@
 
     // Crear nuevo link con notificación visual
     document.getElementById('create').onclick = async () => {
+      const btn = document.getElementById('create');
+      btn.disabled = true;
+      btn.textContent = 'Creando Link de pago...';
+      
       const amount = parseFloat(document.getElementById('amount').value);
       const desc = document.getElementById('desc').value;
       const email = document.getElementById('email').value;
       const hours = parseInt(document.getElementById('hours').value) || 1;
-      if (!amount || !desc) return showAdvertencia(` ⚠️ Complete el campo Monto y Descripción `);
+      if (!amount || !desc){
+        showAdvertencia(` ⚠️ Complete el campo Monto y Descripción `);
+        btn.disabled = false;
+        btn.textContent = 'Confirmar';
+        return;
+      } 
 
       const res = await fetch(API, {
         method: 'POST',
@@ -281,11 +290,23 @@
       });
 
       const json = await res.json();
+      
       if (json.orderId) {
         showNotice(` ✅ Link creado correctamente `);
         loadList();
         document.getElementById('form').style.display = 'none';
+
+        // Limpiar campos
+        document.getElementById('amount').value = '';
+        document.getElementById('desc').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('hours').value = '';
+        }
+      else {
+        showAdvertencia(` ❌ Error creando link: ${json.message || 'Intente nuevamente'} `);
       }
+      btn.disabled = false;
+      btn.textContent = 'Confirmar';
     };
 
    

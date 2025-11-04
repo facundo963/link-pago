@@ -235,22 +235,78 @@
           }
 
           if (p.status === "rechazado") {
-            clearInterval(interval);
-            document.body.innerHTML = `
-              <div class="confirmado" style="border-color:#e84118;">
-                <h2 style="color:#c0392b;">Pago Rechazado</h2>
-                <div class="check" style="background:#e84118;">✕</div>
-                <div class="grid-datos">
-                  <div>Monto Esperado</div><div class="dato">$${p.amount}</div>
-                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
-                  <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto o error en la transferencia"}</div>
-                  </div>
-                  <div class="footer">Se devolvieron los fondos automáticamente al origen.</div>
-                  </div>`;
-            return;
-          }
-          
+  clearInterval(interval);
+  document.body.innerHTML = `
+    <div class="confirmado" style="border-color:#e84118;">
+      <div class="check" style="background:#e84118;">✕</div>
+      <h2 style="color:#c0392b;">Pago Rechazado</h2>
+      <div class="grid-datos">
+        <div>Monto Esperado</div><div class="dato">$${p.amount}</div>
+        <div>ID Orden</div><div class="dato">${p.orderId}</div>
+        <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto o error en la transferencia"}</div>
+      </div>
+      <button class="btn-pago" id="retry-btn">🔁 Volver a intentar pago</button>
+      <div class="footer">Se devolvieron los fondos automáticamente al origen.</div>
+    </div>
 
+    <div id="toast" style="
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #222;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.4s, transform 0.4s;
+      transform: translateY(20px);
+      font-size: 15px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      z-index: 999;
+    "></div>
+  `;
+
+  const toast = document.getElementById("toast");
+
+  function showToast(msg, color = "#222") {
+    toast.textContent = msg;
+    toast.style.background = color;
+    toast.style.opacity = 1;
+    toast.style.transform = "translateY(0)";
+    setTimeout(() => {
+      toast.style.opacity = 0;
+      toast.style.transform = "translateY(20px)";
+    }, 3000);
+  }
+
+  document.getElementById("retry-btn").onclick = async () => {
+    const btn = document.getElementById("retry-btn");
+    btn.disabled = true;
+    btn.textContent = "Generando nuevo link...";
+
+    try {
+      const res = await fetch(`/api/payments/${p.orderId}/retry`, { method: "POST" });
+      const json = await res.json();
+
+      if (json.newOrderId) {
+        showToast("✅ Nuevo link generado correctamente", "#16a34a");
+        setTimeout(() => {
+          window.location.href = `/payment.html?order=${json.newOrderId}`;
+        }, 1500);
+      } else {
+        showToast("❌ Error al generar el link", "#e74c3c");
+        btn.textContent = "Volver a intentar pago";
+        btn.disabled = false;
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("⚠️ Error de conexión con el servidor", "#f39c12");
+      btn.textContent = "Volver a intentar pago";
+      btn.disabled = false;
+    }
+  };
+  return;
+}
           if (p.status === "expirado") {
             clearInterval(interval);
             document.body.innerHTML = `
