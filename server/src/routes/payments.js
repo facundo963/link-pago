@@ -177,11 +177,15 @@ router.post("/webhooks/collection_received", async (req, res) => {
         console.error("❌ Error devolviendo fondos:", err.response?.data || err.message);
       }
 
-      
+      //Segundo intento de cobro
+      payment.status = "pendiente";
+      await payment.save();
+
+      console.log(`🔄 Link ${payment.orderId} reactivado para nuevo intento de pago.`);
       return;
     }
 
-    // ✅ Si el monto coincide, marcar como completado
+    // Si el monto coincide, marcar como completado
     payment.status = "completado";
     payment.paymentInfo.origen = {
       titular: data.customer_name,
@@ -228,77 +232,6 @@ router.post("/webhooks/register", async (req, res) => {
   }
 
 });
-
-
-  //Reintentar pago rechazado
-
-  router.post("/:orderId/retry", async (req, res) => {
-    try {
-    const payment = await Payment.findOne({ orderId: req.params.orderId });
-    if (!payment || payment.status !== "rechazado") {
-      return res.status(400).json({ error: "Solo se puede reintentar un pago rechazado" });
-    }
-
-    // Generar nuevos datos
-    const newOrderId = crypto.randomBytes(4).toString("hex");
-    const aliasPersonalizado = `linkpago-${newOrderId}`;
-    const customerId = `cliente-${newOrderId}`;
-
-    // Crear nuevo CVU
-    const cvuRes = await axios.put(
-      `${CUCURU_BASE_URL}/collection/accounts/account`,
-      { customer_id: customerId, read_only: "false" },
-      {
-        headers: {
-          "X-Cucuru-Api-Key": CUCURU_API_KEY,
-          "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    const newCvu = cvuRes.data?.account_number;
-
-    // Asignar alias
-    await axios.post(
-      `${CUCURU_BASE_URL}/collection/accounts/account/alias`,
-      { account_number: newCvu, alias: aliasPersonalizado },
-      {
-        headers: {
-          "X-Cucuru-Api-Key": CUCURU_API_KEY,
-          "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    // Crear nuevo documento en Mongo
-    const newPayment = new Payment({
-      orderId: newOrderId,
-      amount: payment.amount,
-      description: payment.description,
-      customerEmail: payment.customerEmail,
-      expiresAt: new Date(Date.now() + 3600 * 1000), // 1 hora
-      status: "pendiente",
-      paymentInfo: {
-        alias: aliasPersonalizado,
-        titular: "Cuenta Comercio LinkPago",
-        cvu: newCvu,
-      },
-    });
-    await newPayment.save();
-
-    res.json({
-      message: "Nuevo link de pago generado",
-      newOrderId,
-      alias: aliasPersonalizado,
-      cvu: newCvu,
-    });
-  } catch (err) {
-    console.error("❌ Error reintentando pago:", err.response?.data || err.message);
-    res.status(500).json({ error: "Error al reintentar el pago" });
-  }
-  });
 
 
 module.exports = router;
