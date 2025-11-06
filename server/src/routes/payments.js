@@ -149,9 +149,12 @@ router.post("/webhooks/collection_received", async (req, res) => {
     }
 
     //  Validar monto exacto
+    //  Validar monto exacto
     const montoEsperado = Number(payment.amount);
     const montoRecibido = Number(data.amount);
+
     if (Math.abs(montoEsperado - montoRecibido) > 0.0001) {
+      // Marcar como rechazado temporalmente
       payment.status = "rechazado";
       payment.motivoRechazo = `Monto incorrecto: esperado ${montoEsperado}, recibido ${montoRecibido}`;
       await payment.save();
@@ -160,8 +163,7 @@ router.post("/webhooks/collection_received", async (req, res) => {
         `❌ Monto incorrecto para pago ${payment.orderId}. Esperado: ${montoEsperado}, Recibido: ${montoRecibido}`
       );
 
-      let devolucionExitosa = false;
-
+      // Intentar devolución de fondos
       try {
         const rejectBody = {
           collection_id: data.collection_id,
@@ -177,10 +179,7 @@ router.post("/webhooks/collection_received", async (req, res) => {
           },
         });
 
-        devolucionExitosa = true;
-        console.log(
-          `🔁 Transferencia devuelta (collection_id: ${data.collection_id})`
-        );
+        console.log(`🔁 Fondos devueltos (${data.collection_id})`);
       } catch (err) {
         console.error(
           "❌ Error devolviendo fondos:",
@@ -188,14 +187,17 @@ router.post("/webhooks/collection_received", async (req, res) => {
         );
       }
 
-      // ✅ Solo reactivar si se devolvió correctamente
-      if (devolucionExitosa) {
-        payment.status = "pendiente";
-        await payment.save();
-        console.log(
-          `🔄 Link ${payment.orderId} reactivado para nuevo intento de pago.`
-        );
-      }
+      // 🕒 Reactivar automáticamente el alias tras 10 segundos
+      setTimeout(async () => {
+        const p = await Payment.findOne({ orderId: payment.orderId });
+        if (p && p.status === "rechazado") {
+          p.status = "pendiente";
+          await p.save();
+          console.log(
+            `🔄 Link ${p.orderId} reactivado automáticamente (mismo alias).`
+          );
+        }
+      }, 10000);
 
       return;
     }
