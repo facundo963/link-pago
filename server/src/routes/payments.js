@@ -5,7 +5,8 @@ const crypto = require("crypto");
 const axios = require("axios");
 
 // Configuración API Cucuru
-const CUCURU_BASE_URL = process.env.CUCURU_BASE_URL || "https://api.cucuru.com/app/v1";
+const CUCURU_BASE_URL =
+  process.env.CUCURU_BASE_URL || "https://api.cucuru.com/app/v1";
 const CUCURU_API_KEY = process.env.CUCURU_API_KEY;
 const CUCURU_COLLECTOR_ID = process.env.CUCURU_COLLECTOR_ID;
 
@@ -14,7 +15,9 @@ router.post("/", async (req, res) => {
   try {
     const { amount, description, customerEmail, expiresInHours } = req.body;
     const orderId = crypto.randomBytes(4).toString("hex");
-    const expiresAt = new Date(Date.now() + (expiresInHours || 1) * 3600 * 1000);
+    const expiresAt = new Date(
+      Date.now() + (expiresInHours || 1) * 3600 * 1000
+    );
 
     // Generar alias y customer_id únicos
     const aliasPersonalizado = `linkpago-${orderId}`;
@@ -59,7 +62,10 @@ router.post("/", async (req, res) => {
       );
       console.log("✅ Alias asignado:", aliasPersonalizado);
     } catch (err) {
-      console.error("⚠️ Error asignando alias:", err.response?.data || err.message);
+      console.error(
+        "⚠️ Error asignando alias:",
+        err.response?.data || err.message
+      );
     }
 
     // Guardar en MongoDB
@@ -120,7 +126,6 @@ router.put("/:orderId/status", async (req, res) => {
   res.json({ message: "Estado actualizado", payment });
 });
 
-
 // Webhook oficial Cucuru → notificación de cobro
 router.post("/webhooks/collection_received", async (req, res) => {
   // ✅ Responder rápido a Cucuru (HTTP 200)
@@ -146,7 +151,6 @@ router.post("/webhooks/collection_received", async (req, res) => {
     //  Validar monto exacto
     const montoEsperado = Number(payment.amount);
     const montoRecibido = Number(data.amount);
-
     if (Math.abs(montoEsperado - montoRecibido) > 0.0001) {
       payment.status = "rechazado";
       payment.motivoRechazo = `Monto incorrecto: esperado ${montoEsperado}, recibido ${montoRecibido}`;
@@ -156,7 +160,8 @@ router.post("/webhooks/collection_received", async (req, res) => {
         `❌ Monto incorrecto para pago ${payment.orderId}. Esperado: ${montoEsperado}, Recibido: ${montoRecibido}`
       );
 
-      //  Rechazar y devolver dinero
+      let devolucionExitosa = false;
+
       try {
         const rejectBody = {
           collection_id: data.collection_id,
@@ -172,16 +177,26 @@ router.post("/webhooks/collection_received", async (req, res) => {
           },
         });
 
-        console.log(`🔁 Transferencia devuelta (collection_id: ${data.collection_id})`);
+        devolucionExitosa = true;
+        console.log(
+          `🔁 Transferencia devuelta (collection_id: ${data.collection_id})`
+        );
       } catch (err) {
-        console.error("❌ Error devolviendo fondos:", err.response?.data || err.message);
+        console.error(
+          "❌ Error devolviendo fondos:",
+          err.response?.data || err.message
+        );
       }
 
-      //Segundo intento de cobro
-      payment.status = "pendiente";
-      await payment.save();
+      // ✅ Solo reactivar si se devolvió correctamente
+      if (devolucionExitosa) {
+        payment.status = "pendiente";
+        await payment.save();
+        console.log(
+          `🔄 Link ${payment.orderId} reactivado para nuevo intento de pago.`
+        );
+      }
 
-      console.log(`🔄 Link ${payment.orderId} reactivado para nuevo intento de pago.`);
       return;
     }
 
@@ -200,7 +215,6 @@ router.post("/webhooks/collection_received", async (req, res) => {
     console.error("❌ Error procesando webhook:", err.message);
   }
 });
-
 
 //  Registrar webhook (solo una vez)
 router.post("/webhooks/register", async (req, res) => {
@@ -227,11 +241,12 @@ router.post("/webhooks/register", async (req, res) => {
     console.log("✅ Webhook registrado:", webhookUrl);
     res.json({ success: true, data });
   } catch (err) {
-    console.error("❌ Error registrando webhook:", err.response?.data || err.message);
+    console.error(
+      "❌ Error registrando webhook:",
+      err.response?.data || err.message
+    );
     res.status(500).json({ error: "Error registrando webhook" });
   }
-
 });
-
 
 module.exports = router;
