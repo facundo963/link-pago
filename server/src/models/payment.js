@@ -9,7 +9,7 @@ const paymentSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "pendiente",
-    enum: ["pendiente", "completado", "expirado","rechazado", "sobrante", "faltante"],
+    enum: ["pendiente", "completado", "expirado","rechazado", "sobrante", "faltante", "cancelado"],
   },
   motivoRechazo: String,
   createdAt: { type: Date, default: Date.now },

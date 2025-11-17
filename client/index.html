@@ -4,117 +4,158 @@
 <head>
   <meta charset="utf-8">
   <title>Panel de Cobros</title>
+
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f5f8;
+    /* =============================
+       ESTILO PROFESIONAL COMPLETO
+       ============================= */
+
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f3f5;
+      color: #333;
+    }
+
+    /* Header */
     header {
       background: #fff;
       padding: 15px 30px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
     h1 {
-      font-size: 22px;
-      margin: 0;
-      color: #333;
+      font-size: 20px;
+      font-weight: 600;
+      color: #222;
     }
 
     button#create-link {
-      background: #007bff;
+      background: #2563eb;
       color: white;
       border: none;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
+      transition: .2s;
     }
 
     button#create-link:hover {
-      background: #0056b3;
+      background: #1e40af;
     }
 
+    /* Main */
     main {
       padding: 25px 40px;
-      margin-left: 120px;
+      margin-left: 160px;
     }
 
+    /* Tabla */
     table {
-      border-collapse: collapse;
       width: 100%;
+      border-collapse: collapse;
       margin-top: 15px;
       background: #fff;
-      border-radius: 8px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
       overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     th,
     td {
       padding: 12px 10px;
+      font-size: 14px;
       text-align: left;
     }
 
     th {
-      background: #e9edf2;
+      background: #f3f4f6;
       color: #333;
       font-weight: 600;
-      font-size: 14px;
     }
 
     td {
-      font-size: 14px;
+      border-top: 1px solid #e5e7eb;
       color: #555;
-      border-top: 1px solid #f0f0f0;
     }
 
     tr:hover {
-      background: #f9fbfd;
+      background: #f9fafb;
     }
 
-    /*  estados */
+    /* ESTADOS */
     .estado {
-      color: white;
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 20px;
       font-size: 13px;
       font-weight: 600;
+      min-width: 90px;
       display: inline-block;
       text-align: center;
-      min-width: 100px;
-    }
-
-    .completado {
-      background: #2ecc71;
     }
 
     .pendiente {
-      background: #3f3d56;
+      background: #1e3a8a;
+      color: white;
     }
 
-    .vencido {
-      background: #95a5a6;
+    .completado {
+      background: #16a34a;
+      color: white;
+    }
+
+    .expirado {
+      background: #e5e7eb;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .cancelado,
+    .rechazado {
+      background: #dc2626;
+      color: white;
     }
 
     .sobrante {
-      background: #f39c12;
+      background: #f59e0b;
+      color: white;
     }
 
     .faltante {
-      background: #e74c3c;
+      background: #b91c1c;
+      color: white;
     }
 
-    .rechazado {
-      background: #e84118;;
+    /* Botón cancelar */
+    .cancel-btn {
+      background: #dc2626;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: .2s;
     }
 
+    .cancel-btn:hover {
+      background: #b91c1c;
+    }
+
+    /* Link recortado */
     td.link-cell {
       position: relative;
       width: 260px;
@@ -127,103 +168,165 @@
     .copy-btn {
       position: absolute;
       right: 6px;
+      top: 50%;
       transform: translateY(-50%);
+      font-size: 18px;
       background: none;
       border: none;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      top: 50%;
+      color: #444;
     }
 
     .copy-btn:hover {
-      color: #007bff;
+      color: #2563eb;
     }
 
-    /* Formulario flotante */
+    /* Formulario nuevo link */
     #form {
       background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 18px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       display: none;
       margin-top: 20px;
     }
 
     #form input,
     #form button {
-      margin: 8px;
-      padding: 8px;
-      border: 1px solid #ccc;
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
       border-radius: 6px;
-      font-size: 14px;
+      border: 1px solid #ccc;
     }
 
     #form button {
-      background: #28a745;
+      background: #16a34a;
       color: white;
-      cursor: pointer;
+      font-weight: 600;
       border: none;
+      transition: .2s;
     }
 
     #form button:hover {
-      background: #1f8c3b;
+      background: #15803d;
     }
 
-    /* Panel lateral */
+    /* Sidebar */
     #sidebar {
-      left: 0;
-      top: 80px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      left: 10px;
+      top: 100px;
+      width: 120px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px 0;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
       display: flex;
       flex-direction: column;
+      gap: 12px;
       align-items: center;
-      padding: 15px 0;
-      width: 140px;
-      height: auto;
-      position: fixed;
-      z-index: 1000;
     }
 
     .side-btn {
-
-      border: none;
-      color: #444;
-      font-size: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 12px 0;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
       background: none;
+      border: none;
+      font-size: 18px;
+      color: #1f2937;
+      cursor: pointer;
+      transition: .2s;
+      text-align: center;
     }
 
     .side-btn span {
       font-size: 12px;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .side-btn:hover {
-      color: #d63031;
       transform: scale(1.05);
+      color: #2563eb;
+    }
+
+    /* POPUP CANCELAR */
+    #cancel-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeInPopup .25s ease;
+    }
+
+    @keyframes fadeInPopup {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.85);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      #sidebar {
+        display: none;
+      }
+
+      main {
+        margin-left: 0;
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      button#create-link {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
     }
   </style>
 </head>
 
 <body>
+
   <header>
     <h1>Panel de Cobros</h1>
     <button id="create-link">+ Crear link de pago</button>
   </header>
 
   <main>
+
+    <!-- FORMULARIO CREACIÓN -->
     <div id="form">
       <input id="amount" placeholder="Monto">
       <input id="desc" placeholder="Descripción">
@@ -232,21 +335,14 @@
       <button id="create">Confirmar</button>
     </div>
 
+    <!-- SIDEBAR -->
     <div id="sidebar">
-      <button class="side-btn">
-        🔄
-        <span>Actualizar</span>
-      </button>
-      <button class="side-btn">
-        ☁️
-        <span>Descargar</span>
-      </button>
-      <button class="side-btn">
-        📊
-        <span>Datos<br>Estadísticos</span>
-      </button>
+      <button class="side-btn">🔄<span>Actualizar</span></button>
+      <button class="side-btn">☁️<span>Descargar</span></button>
+      <button class="side-btn">📊<span>Datos<br>Estadísticos</span></button>
     </div>
 
+    <!-- TABLA -->
     <table id="list">
       <tr>
         <th>Estado</th>
@@ -254,10 +350,42 @@
         <th>Monto</th>
         <th>Descripción</th>
         <th>Link</th>
+        <th>Acciones</th>
       </tr>
     </table>
+
   </main>
 
+
+  <!-- POPUP CANCELACIÓN -->
+  <div id="cancel-popup">
+    <div style="
+      background:white;
+      padding:25px 30px;
+      border-radius:10px;
+      width:340px;
+      text-align:center;
+      box-shadow:0 6px 20px rgba(0,0,0,0.25);
+      animation:scaleIn .25s ease;
+    ">
+      <h3 style="margin-bottom:10px;color:#333;">¿Cancelar link?</h3>
+      <p style="color:#666;font-size:14px;">Esta acción bloqueará el alias y el CVU asociados al pago.</p>
+
+      <div style="margin-top:20px; display:flex;gap:12px; justify-content:center;">
+        <button id="cancel-no" style="padding:8px 18px;border:none;background:#b2bec3;color:#2d3436;border-radius:6px;cursor:pointer;">
+          Volver
+        </button>
+
+        <button id="cancel-yes" style="padding:8px 18px;border:none;background:#dc2626;color:white;border-radius:6px;cursor:pointer;">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================
+       SCRIPT ORIGINAL - SIN CAMBIOS
+       ============================= -->
   <script>
     const API = '/api/payments';
 
@@ -266,22 +394,22 @@
       form.style.display = form.style.display === 'block' ? 'none' : 'block';
     };
 
-    // Crear nuevo link con notificación visual
     document.getElementById('create').onclick = async () => {
       const btn = document.getElementById('create');
       btn.disabled = true;
       btn.textContent = 'Creando Link de pago...';
-      
+
       const amount = parseFloat(document.getElementById('amount').value);
       const desc = document.getElementById('desc').value;
       const email = document.getElementById('email').value;
-      const hours = parseInt(document.getElementById('hours').value) || 1;
-      if (!amount || !desc){
-        showAdvertencia(` ⚠️ Complete el campo Monto y Descripción `);
+      const hours = parseFloat(document.getElementById('hours').value) || 1;
+
+      if (!amount || !desc) {
+        showAdvertencia(`⚠️ Complete el campo Monto y Descripción`);
         btn.disabled = false;
         btn.textContent = 'Confirmar';
         return;
-      } 
+      }
 
       const res = await fetch(API, {
         method: 'POST',
@@ -290,64 +418,60 @@
       });
 
       const json = await res.json();
-      
+
       if (json.orderId) {
-        showNotice(` ✅ Link creado correctamente `);
+        showNotice(`✅ Link creado correctamente`);
         loadList();
         document.getElementById('form').style.display = 'none';
-
-        // Limpiar campos
         document.getElementById('amount').value = '';
         document.getElementById('desc').value = '';
         document.getElementById('email').value = '';
         document.getElementById('hours').value = '';
-        }
-      else {
-        showAdvertencia(` ❌ Error creando link: ${json.message || 'Intente nuevamente'} `);
+      } else {
+        showAdvertencia(`❌ Error creando link: ${json.message || 'Intente nuevamente'}`);
       }
+
       btn.disabled = false;
       btn.textContent = 'Confirmar';
     };
 
-   
-   function showAdvertencia(msg) {
+    function showAdvertencia(msg) {
       let advertencia = document.getElementById('advertencia');
       if (!advertencia) {
         advertencia = document.createElement('div');
         advertencia.id = 'advertencia';
         advertencia.style = `
-        background: #fff3cd;
-        border: 1px solid #ffeeba;
-        padding: 10px 15px;
-        border-radius: 6px;
-        margin-top: 15px;
-        color: #856404;
-        font-weight: 500;
-        animation: fadeIn 0.3s ease;
-      `;
+          background: #fff3cd;
+          border: 1px solid #ffeeba;
+          padding: 10px 15px;
+          border-radius: 6px;
+          margin-top: 15px;
+          color: #856404;
+          font-weight: 500;
+          animation: fadeIn 0.3s ease;
+        `;
         document.querySelector('main').prepend(advertencia);
       }
       advertencia.innerHTML = msg;
       advertencia.style.display = 'block';
       setTimeout(() => advertencia.style.display = 'none', 4000);
     }
-   
-    //  Mostrar aviso visual (reutilizable)
+
     function showNotice(msg) {
       let notice = document.getElementById('notice');
       if (!notice) {
         notice = document.createElement('div');
         notice.id = 'notice';
         notice.style = `
-        background: #e6ffe6;
-        border: 1px solid #00aa00;
-        padding: 10px 15px;
-        border-radius: 6px;
-        margin-top: 15px;
-        color: #008000;
-        font-weight: 500;
-        animation: fadeIn 0.3s ease;
-      `;
+          background: #e6ffe6;
+          border: 1px solid #00aa00;
+          padding: 10px 15px;
+          border-radius: 6px;
+          margin-top: 15px;
+          color: #008000;
+          font-weight: 500;
+          animation: fadeIn 0.3s ease;
+        `;
         document.querySelector('main').prepend(notice);
       }
       notice.innerHTML = msg;
@@ -359,16 +483,19 @@
       const res = await fetch(API + '/all');
       const arr = await res.json();
       const table = document.getElementById('list');
-      table.innerHTML = '<tr><th>Estado</th><th>ID</th><th>Monto</th><th>Descripción</th><th>Link</th></tr>';
+      table.innerHTML = `
+      <tr>
+        <th>Estado</th>
+        <th>ID</th>
+        <th>Monto</th>
+        <th>Descripción</th>
+        <th>Link</th>
+        <th>Acciones</th>
+      </tr>`;
 
       arr.forEach(p => {
         const tr = document.createElement('tr');
-        let estadoClass = 'pendiente';
-        if (p.status === 'completado') estadoClass = 'completado';
-        else if (p.status === 'vencido') estadoClass = 'vencido';
-        else if (p.status === 'sobrante') estadoClass = 'sobrante';
-        else if (p.status === 'rechazado') estadoClass = 'rechazado';
-        else if (p.status === 'faltante') estadoClass = 'faltante';
+        let estadoClass = p.status;
 
         const paymentUrl = `${window.location.origin}/payment.html?order=${p.orderId}`;
         tr.innerHTML = `
@@ -378,28 +505,58 @@
         <td>${p.description || '-'}</td>
         <td class="link-cell">
           <span data-full="${paymentUrl}">${paymentUrl}</span>
-          <button class="copy-btn" data-link="${paymentUrl}" title="Copiar link">📋</button>
+          <button class="copy-btn" data-link="${paymentUrl}">📋</button>
+        </td>
+        <td>
+          ${p.status === 'pendiente' || p.status === 'rechazado'
+            ? `<button class="cancel-btn" onclick="cancelarPago('${p.orderId}')">❌ Cancelar</button>`
+            : '-'}
         </td>
       `;
         table.appendChild(tr);
       });
 
+      document.querySelectorAll('.side-btn')[0].onclick = () =>
+        loadList() & showNotice('🔄 Lista actualizada');
+
       document.querySelectorAll('.copy-btn').forEach(btn => {
         btn.onclick = () => {
-          const link = btn.dataset.link;
-          navigator.clipboard.writeText(link);
+          navigator.clipboard.writeText(btn.dataset.link);
           btn.textContent = '✅';
-          setTimeout(() => (btn.textContent = '📋'), 1600);
+          setTimeout(() => btn.textContent = '📋', 1600);
         };
-
-        // 🔄 Botón lateral para recargar la lista
-        document.querySelectorAll('.side-btn')[0].onclick = () => {
-          loadList();
-          showNotice('🔄 Lista actualizada');
-        };
-
       });
     }
+
+    let cancelOrderId = null;
+
+    function cancelarPago(orderId) {
+      cancelOrderId = orderId;
+      const popup = document.getElementById("cancel-popup");
+      popup.style.display = "flex";
+
+      document.getElementById("cancel-no").onclick = () => {
+        popup.style.display = "none";
+      };
+
+      document.getElementById("cancel-yes").onclick = async () => {
+        try {
+          const res = await fetch(`/api/payments/${cancelOrderId}/cancel`, { method: "POST" });
+          const data = await res.json();
+          popup.style.display = "none";
+
+          if (data.success) {
+            showNotice("✅ Link cerrado correctamente.");
+            loadList();
+          } else showAdvertencia(data.error || "No se pudo cancelar el link.");
+
+        } catch (err) {
+          popup.style.display = "none";
+          showAdvertencia("⚠️ Error de conexión.");
+        }
+      };
+    }
+
     loadList();
   </script>
 

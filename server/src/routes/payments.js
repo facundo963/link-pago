@@ -80,6 +80,7 @@ router.post("/", async (req, res) => {
         alias: aliasPersonalizado,
         titular: "Cuenta Comercio LinkPago",
         cvu: accountNumber,
+        customerId: customerId,
       },
     });
     await newPayment.save();
@@ -101,17 +102,92 @@ router.post("/", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     const payments = await Payment.find().sort({ createdAt: -1 });
+
+    const ahora = new Date();
+
+    for (const p of payments) {
+      if (p.status === "pendiente" && p.expiresAt && ahora >= p.expiresAt) {
+
+        p.status = "expirado";
+
+        // Cerrar CVU
+        try {
+          await axios.put(
+            `${CUCURU_BASE_URL}/collection/accounts/account`,
+            {
+              account_number: p.paymentInfo?.cvu,
+              customer_id: p.paymentInfo?.customerId,
+              read_only: "true",
+              on_received: "reject"
+            },
+            {
+              headers: {
+                "X-Cucuru-Api-Key": CUCURU_API_KEY,
+                "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
+                "Content-Type": "application/json"
+              }
+            }
+          );
+          console.log(`⏰🔒 Link ${p.orderId} vencido (panel) y CVU cerrado.`);
+        } catch (err) {
+          console.error("❌ Error cerrando CVU:", err.response?.data || err.message);
+        }
+
+        await p.save();
+      }
+    }
+
     res.json(payments);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+
 //  Obtener un pago por ID
 router.get("/:orderId", async (req, res) => {
   const payment = await Payment.findOne({ orderId: req.params.orderId });
   if (!payment) return res.status(404).json({ error: "Pago no encontrado" });
+  
+  //Expiracion automatica
+  if (payment.expiresAt && payment.status === "pendiente") {
+    const ahora = new Date();
+    if (ahora >= payment.expiresAt) {
+      // Marcar como expirado
+      payment.status = "expirado";
+
+      // Bloquear CVU en Cucuru
+      try {
+        await axios.put(
+          `${CUCURU_BASE_URL}/collection/accounts/account`,
+          {
+            account_number: payment.paymentInfo?.cvu,
+            customer_id: payment.paymentInfo?.customerId,
+            read_only: "true",
+            on_received: "reject",
+          },
+          {
+            headers: {
+              "X-Cucuru-Api-Key": CUCURU_API_KEY,
+              "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(`⏰🔒 Link ${payment.orderId} vencido y CVU cerrado.`);
+      } catch (err) {
+        console.error(
+          "❌ Error cerrando CVU vencido:",
+          err.response?.data || err.message
+        );
+      }
+
+      await payment.save();
+    }
+  }
+
   res.json(payment);
+
 });
 
 // Actualizar estado manualmente
@@ -148,7 +224,7 @@ router.post("/webhooks/collection_received", async (req, res) => {
       return;
     }
 
-    //  Validar monto exacto
+    
     //  Validar monto exacto
     const montoEsperado = Number(payment.amount);
     const montoRecibido = Number(data.amount);
@@ -187,7 +263,7 @@ router.post("/webhooks/collection_received", async (req, res) => {
         );
       }
 
-      // 🕒 Reactivar automáticamente el alias tras 10 segundos
+      //  Reactivar automáticamente el alias tras 10 segundos
       setTimeout(async () => {
         const p = await Payment.findOne({ orderId: payment.orderId });
         if (p && p.status === "rechazado") {
@@ -216,6 +292,33 @@ router.post("/webhooks/collection_received", async (req, res) => {
   } catch (err) {
     console.error("❌ Error procesando webhook:", err.message);
   }
+  // Cerrar CVU/ALIAS para no recibir más pagos.
+  try {
+  await axios.put(
+    `${CUCURU_BASE_URL}/collection/accounts/account`,
+    {
+      account_number: payment.paymentInfo.cvu,
+      customer_id: payment.paymentInfo.customerId,
+      read_only: "true",
+      on_received: "reject"
+    },
+    {
+      headers: {
+        "X-Cucuru-Api-Key": CUCURU_API_KEY,
+        "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  console.log(`🔒 Alias/CVU del pago ${payment.orderId} cerrado post-pago.`);
+} catch (err) {
+  console.error(
+    "❌ Error cerrando alias/CVU luego del pago:",
+    err.response?.data || err.message
+  );
+}
+
 });
 
 //  Registrar webhook (solo una vez)
@@ -250,5 +353,69 @@ router.post("/webhooks/register", async (req, res) => {
     res.status(500).json({ error: "Error registrando webhook" });
   }
 });
+
+
+  // Cancelar link de pago (bloquea el CVU y marca como cancelado)
+router.post("/:orderId/cancel", async (req, res) => {
+  try {
+    const payment = await Payment.findOne({ orderId: req.params.orderId });
+    if (!payment)
+      return res.status(404).json({ error: "Pago no encontrado" });
+
+    // No permitir cancelar pagos ya completados
+    if (payment.status === "completado") {
+      return res.status(400).json({ error: "No se puede cancelar un pago ya completado." });
+    }
+
+    const { alias, cvu } = payment.paymentInfo || {};
+    
+    // Obtener customerId
+    const customerId = payment.paymentInfo?.customerId || payment.paymentInfo?.customer_id ||
+     `cliente-${payment.orderId}`; 
+    console.log(`🔎 Cerrando cuenta Cucuru: ${cvu} (${customerId})`);
+
+    // Bloquear CVU en Cucuru
+    try {
+      await axios.post(
+        `${CUCURU_BASE_URL}/collection/accounts/account`,
+        {
+          account_number: cvu,
+          customer_id: customerId,
+          read_only: "true",
+          on_received: "reject",
+        },
+        {
+          headers: {
+            "X-Cucuru-Api-Key": CUCURU_API_KEY,
+            "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(` Alias ${alias} cerrado correctamente (on_received: reject)`);
+    } catch (err) {
+      console.error(
+        "❌ Error configurando alias como reject:", err.response?.data || err.message
+      );
+    }
+
+    // Actualizar estado en MongoDB
+    payment.status = "cancelado";
+    payment.paymentInfo.bloqueado = true;
+    payment.paymentInfo.cerradoEn = new Date();
+    await payment.save();
+
+    res.json({
+      success: true,
+      message: "✅ Link cancelado y CVU bloqueado correctamente.",
+      payment,
+    });
+  } catch (err) {
+    console.error("❌ Error cancelando link de pago:", err.message);
+    res.status(500).json({ error: "Error cancelando link de pago" });
+  }
+});
+
+
 
 module.exports = router;

@@ -7,37 +7,40 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #dcdde1;
+      background: #f4f5f8;
       margin: 0;
-      padding: 40px;
+      padding: 20px;
     }
 
     h2 {
-      margin-top: 0;
+      margin: 10px auto 20px auto;
       color: #2f3640;
+      max-width: 1000px;
     }
 
+    /* --- CONTENEDOR PRINCIPAL --- */
     .container {
-      background: #e0e0e0;
+      background: #ffffff;
       border-radius: 10px;
-      padding: 30px;
-      max-width: 1000px;
+      padding: 25px;
+      max-width: 820px;
       margin: 0 auto;
       display: flex;
-      gap: 30px;
+      gap: 24px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
-    .box,
-    .right {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      background: #f1f2f6;
-      border: 1px solid #555;
-      border-radius: 4px;
-      padding: 25px;
-    }
+    /* --- COLUMNA IZQUIERDA Y DERECHA --- */
+   .box, .right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #f8f9fb;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  padding: 22px;
+}
 
     .label {
       font-weight: 600;
@@ -46,32 +49,26 @@
     }
 
     .value {
-      background: #dfe4ea;
-      padding: 8px 14px;
-      border-radius: 20px;
+      background: #eef2f7;
+      padding: 10px 15px;
+      border-radius: 8px;
       margin-top: 5px;
+      font-size: 15px;
     }
 
+    /* --- ADVERTENCIA --- */
     .warning {
-      border: 2px dashed #e84118;
+      border-left: 4px solid #e84118;
       background: #fff5f5;
       color: #c23616;
-      padding: 15px;
-      border-radius: 8px;
+      padding: 15px 12px;
+      border-radius: 6px;
       font-size: 14px;
-      position: relative;
     }
 
-    .warning::before {
-      content: "⚠️";
-      font-size: 23px;
-      position: absolute;
-      left: -14px;
-      top: -13px;
-    }
-
+    /* --- CAJAS DE COPIA --- */
     .copy-box {
-      border: 2px dashed #4b4b8f;
+      border: 1px solid #d3d3ee;
       padding: 10px 15px;
       border-radius: 6px;
       font-size: 15px;
@@ -96,36 +93,39 @@
       transform: scale(1.1);
     }
 
+    /* --- BOTÓN PRINCIPAL --- */
     .btn-pago {
-      background: #636e72;
+      background: #007bff;
       color: white;
       border: none;
       padding: 12px 30px;
-      border-radius: 25px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 15px;
       margin-top: 30px;
-      align-self: center;
-      width: 80%;
-    }
-
-    .btn-pago:hover {
-      background: #2d3436;
-    }
-
-    .confirmado {
-      background: #dcdde1;
-      border: 1px solid #444;
-      border-radius: 8px;
-      max-width: 720px;
-      margin: 40px auto;
-      padding: 24px;
+      width: 100%;
       text-align: center;
     }
 
+    .btn-pago:hover {
+      background: #0056b3;
+    }
+
+    /* --- MENSAJES DE ESTADOS (CONFIRMADO, CANCELADO, ETC.) --- */
+    .confirmado {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
     .confirmado h2 {
-      margin: 0 0 8px 0;
+      margin: 0 0 12px 0;
       color: #2f3640;
     }
 
@@ -137,52 +137,71 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
+      font-size: 30px;
       color: #fff;
-      margin: 8px auto 10px auto;
+      margin: 10px auto;
     }
 
     .grid-datos {
       display: grid;
-      grid-template-columns: 200px 1fr;
+      grid-template-columns: 180px 1fr;
       gap: 10px 16px;
-      align-items: center;
       text-align: left;
-      margin: 0 auto;
-      max-width: 600px;
+      margin: 20px auto;
+      max-width: 500px;
     }
 
     .dato {
       background: #eef2f7;
-      border-radius: 18px;
+      border-radius: 6px;
       padding: 8px 14px;
     }
 
     .footer {
-      margin-top: 18px;
+      margin-top: 14px;
       color: #555;
       font-size: 14px;
+    }
+
+    /* -------- RESPONSIVE -------- */
+    @media (max-width: 880px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .grid-datos {
+        grid-template-columns: 1fr;
+      }
+
+      body {
+        padding: 10px;
+      }
+
+      h2 {
+        padding-left: 6px;
+      }
     }
   </style>
 </head>
 
 <body>
+
   <h2>Hace tu pago</h2>
 
   <div class="container" id="content">
-    <div class="box">
-      <div class="label">Datos de tu pago</div>
 
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="box">
       <div class="label">Monto</div>
       <div class="value" id="monto">$—</div>
 
-      <div class="label">Referencia del pago</div>
+      <div class="label">Descripción</div>
       <div class="value" id="desc">—</div>
 
       <div class="label">Vencimiento</div>
       <div class="value" id="vence">—</div>
 
-      <div class="label">Titular del pago</div>
+      <div class="label">Titular</div>
       <div class="value" id="titular">—</div>
 
       <div class="label">Email cliente</div>
@@ -191,18 +210,21 @@
       <div class="label">ID Orden</div>
       <div class="value" id="orden">—</div>
 
-      <button class="btn-pago" id="paid" disabled>Esperando confirmación...</button>
+      <button class="btn-pago" id="paid" disabled>
+        Esperando confirmación...
+      </button>
     </div>
 
+    <!-- COLUMNA DERECHA -->
     <div class="right">
+
       <div class="warning">
-        <b>Cuidado</b><br>
-        Los datos de pago son exclusivos para esta orden de compra.<br>
-        No intentes volver a usarlos para otra compra.
+        <b>Cuidado:</b> estos datos son exclusivos del pago.  
+        No los uses para otra operación.
       </div>
 
       <div class="copy-box">
-        <span><b>ALIAS:</b> <span id="alias">---</span></span>
+        <span><b>Alias:</b> <span id="alias">---</span></span>
         <button class="copy-btn" data-target="alias">📋</button>
       </div>
 
@@ -210,18 +232,20 @@
         <span><b>CVU:</b> <span id="cvu">---</span></span>
         <button class="copy-btn" data-target="cvu">📋</button>
       </div>
+
     </div>
+
   </div>
 
+  <!-- ======================= JS ======================= -->
   <script>
     const params = new URLSearchParams(location.search);
     const order = params.get("order");
+
     if (!order) {
       document.body.innerHTML = "<h3>Falta el parámetro 'order'</h3>";
     } else {
       cargarPago();
-
-      // Refresca cada 10 segundos hasta que se confirme
       const interval = setInterval(cargarPago, 10000);
 
       async function cargarPago() {
@@ -234,66 +258,76 @@
             return;
           }
 
-          //  NUEVO BLOQUE MEJORADO (pago rechazado)
+          /* CANCELADO */
+          if (p.status === "cancelado") {
+            clearInterval(interval);
+            document.body.innerHTML = `
+              <div class="confirmado">
+                <div class="check" style="background:none;">🚫</div>
+                <h2>Link Cancelado</h2>
+                <div class="grid-datos">
+                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
+                  <div>Alias</div><div class="dato">${p.paymentInfo?.alias || "-"}</div>
+                </div>
+                <div class="footer">Este link ya no acepta transferencias.</div>
+              </div>`;
+            return;
+          }
+
+          /* RECHAZADO */
           if (p.status === "rechazado") {
             clearInterval(interval);
             document.body.innerHTML = `
               <div class="confirmado" style="border-color:#e84118;">
                 <div class="check" style="background:#e84118;">✕</div>
-                <h2 style="color:#c0392b;">Pago Rechazado</h2>
+                <h2>Pago Rechazado</h2>
                 <div class="grid-datos">
-                  <div>Monto Esperado</div><div class="dato">$${p.amount}</div>
+                  <div>Monto esperado</div><div class="dato">$${p.amount}</div>
                   <div>ID Orden</div><div class="dato">${p.orderId}</div>
-                  <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto o error en la transferencia"}</div>
+                  <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto"}</div>
                 </div>
                 <div class="footer">
-                  Se devolvieron los fondos automáticamente al origen.<br>
-                  <b>El link se reactivará automáticamente en unos segundos.</b><br>
-                  Podés volver a transferir el monto correcto al <b>mismo alias y CVU</b>.
+                  El link se reactivará automáticamente.
+                  Volvé a transferir el monto correcto.
                 </div>
-                <div id="countdown" style="margin-top:12px; font-weight:600; color:#c0392b;">Reactivando en 10 segundos...</div>
-              </div>
-            `;
-
-            // contador visual regresivo
-            let secs = 10;
-            const countdownEl = document.getElementById("countdown");
-            const timer = setInterval(() => {
-              secs--;
-              if (secs <= 0) {
-                clearInterval(timer);
-                countdownEl.textContent = "Link reactivado ✅";
-                setTimeout(() => location.reload(), 1000);
-              } else {
-                countdownEl.textContent = `Reactivando en ${secs} segundos...`;
-              }
-            }, 1000);
-
+              </div>`;
             return;
           }
 
+          /* EXPIRADO */
           if (p.status === "expirado") {
             clearInterval(interval);
             document.body.innerHTML = `
-    <div class="confirmado" style="border-color:#999;">
-      <h2 style="color:#555;">Pago Expirado</h2>
-      <div class="check" style="background:#555;">⏰</div>
-      <div class="grid-datos">
-        <div>Monto</div><div class="dato">$${p.amount}</div>
-        <div>ID Orden</div><div class="dato">${p.orderId}</div>
-      </div>
-      <div class="footer">El link de pago venció y no se aceptan transferencias.</div>
-    </div>`;
+              <div class="confirmado">
+                <div class="check" style="background: none;">⏰</div>
+                <h2>Pago Expirado</h2>
+                <div class="grid-datos">
+                  <div>Monto</div><div class="dato">$${p.amount}</div>
+                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
+                </div>
+                <div class="footer">El link venció y no acepta más pagos.</div>
+              </div>`;
             return;
           }
 
+          /* COMPLETADO */
           if (p.status === "completado") {
             clearInterval(interval);
-            mostrarConfirmacion(p);
+            document.body.innerHTML = `
+              <div class="confirmado">
+                <div class="check">✓</div>
+                <h2>Pago Confirmado</h2>
+                <div class="grid-datos">
+                  <div>Monto</div><div class="dato">$${p.amount}</div>
+                  <div>Descripción</div><div class="dato">${p.description || "-"}</div>
+                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
+                </div>
+                <div class="footer">Gracias por tu compra.</div>
+              </div>`;
             return;
           }
 
-          // Asignar datos visibles
+          /* DATOS DEL PAGO */
           document.getElementById("monto").textContent = `$${p.amount}`;
           document.getElementById("desc").textContent = p.description || "—";
           document.getElementById("vence").textContent = p.expiresAt ? new Date(p.expiresAt).toLocaleString() : "—";
@@ -303,13 +337,13 @@
           document.getElementById("alias").textContent = p.paymentInfo?.alias || "—";
           document.getElementById("cvu").textContent = p.paymentInfo?.cvu || "—";
 
-          // Copiar alias o CVU
+          /* BOTONES DE COPIA */
           document.querySelectorAll(".copy-btn").forEach(btn => {
             btn.onclick = () => {
               const value = document.getElementById(btn.dataset.target).textContent.trim();
               navigator.clipboard.writeText(value);
               btn.textContent = "✅";
-              setTimeout(() => (btn.textContent = "📋"), 1500);
+              setTimeout(() => (btn.textContent = "📋"), 1600);
             };
           });
         } catch (err) {
@@ -318,22 +352,9 @@
           clearInterval(interval);
         }
       }
-
-      function mostrarConfirmacion(p) {
-        document.body.innerHTML = `
-          <div class="confirmado">
-            <h2>Pago Confirmado</h2>
-            <div class="check">✓</div>
-            <div class="grid-datos">
-              <div>Monto</div><div class="dato">$${p.amount}</div>
-              <div>Referencia del pago</div><div class="dato">${p.description || "-"}</div>
-              <div>ID Orden</div><div class="dato">${p.orderId}</div>
-            </div>
-            <div class="footer">Gracias por tu compra.</div>
-          </div>`;
-      }
     }
   </script>
+
 </body>
 
 </html>
