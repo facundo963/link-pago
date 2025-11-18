@@ -107,7 +107,7 @@ router.get("/all", async (req, res) => {
         p.status = "expirado";
 
         try {
-          await axios.put(
+          await axios.post(
             `${CUCURU_BASE_URL}/collection/accounts/account`,
             {
               account_number: p.paymentInfo.cvu,
