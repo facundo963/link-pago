@@ -18,9 +18,7 @@ router.post("/", async (req, res) => {
     const { amount, description, customerEmail, expiresInHours } = req.body;
     const orderId = crypto.randomBytes(4).toString("hex");
 
-    const expiresAt = new Date(
-      Date.now() + (expiresInHours || 1) * 3600 * 1000
-    );
+    const expiresAt = new Date(Date.now() + (expiresInHours || 1) * 3600 * 1000);
 
     const aliasPersonalizado = `linkpago-${orderId}`;
     const customerId = `cliente-${orderId}`;
@@ -69,7 +67,7 @@ router.post("/", async (req, res) => {
     }
 
     // Guardar pago
-    const newPayment = new Payment({
+    await new Payment({
       orderId,
       amount,
       description,
@@ -82,9 +80,7 @@ router.post("/", async (req, res) => {
         cvu: accountNumber,
         customerId,
       },
-    });
-
-    await newPayment.save();
+    }).save();
 
     res.status(201).json({
       orderId,
@@ -114,8 +110,8 @@ router.get("/all", async (req, res) => {
           await axios.put(
             `${CUCURU_BASE_URL}/collection/accounts/account`,
             {
-              account_number: p.paymentInfo?.cvu,
-              customer_id: p.paymentInfo?.customerId,
+              account_number: p.paymentInfo.cvu,
+              customer_id: p.paymentInfo.customerId,
               read_only: "true",
               on_received: "reject",
             },
@@ -127,10 +123,9 @@ router.get("/all", async (req, res) => {
               },
             }
           );
-
-          console.log(`⏰🔒 Link ${p.orderId} vencido (panel) y CVU cerrado.`);
+          console.log(`⏰🔒 CVU ${p.orderId} cerrado por vencimiento`);
         } catch (err) {
-          console.error("❌ Error cerrando CVU vencido:", err.response?.data || err.message);
+          console.error("❌ Error cerrando CVU:", err.response?.data || err.message);
         }
 
         await p.save();
@@ -150,37 +145,35 @@ router.get("/:orderId", async (req, res) => {
   const payment = await Payment.findOne({ orderId: req.params.orderId });
   if (!payment) return res.status(404).json({ error: "Pago no encontrado" });
 
-  // Expiración automática
-  if (payment.status === "pendiente" && payment.expiresAt) {
-    const ahora = new Date();
-    if (ahora >= payment.expiresAt) {
-      payment.status = "expirado";
+  const ahora = new Date();
 
-      try {
-        await axios.put(
-          `${CUCURU_BASE_URL}/collection/accounts/account`,
-          {
-            account_number: payment.paymentInfo?.cvu,
-            customer_id: payment.paymentInfo?.customerId,
-            read_only: "true",
-            on_received: "reject",
+  if (payment.status === "pendiente" && payment.expiresAt && ahora >= payment.expiresAt) {
+    payment.status = "expirado";
+
+    try {
+      await axios.put(
+        `${CUCURU_BASE_URL}/collection/accounts/account`,
+        {
+          account_number: payment.paymentInfo.cvu,
+          customer_id: payment.paymentInfo.customerId,
+          read_only: "true",
+          on_received: "reject",
+        },
+        {
+          headers: {
+            "X-Cucuru-Api-Key": CUCURU_API_KEY,
+            "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
+            "Content-Type": "application/json",
           },
-          {
-            headers: {
-              "X-Cucuru-Api-Key": CUCURU_API_KEY,
-              "X-Cucuru-Collector-Id": CUCURU_COLLECTOR_ID,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        }
+      );
 
-        console.log(`⏰🔒 Link ${payment.orderId} vencido y CVU cerrado.`);
-      } catch (err) {
-        console.error("❌ Error cerrando CVU vencido:", err.response?.data || err.message);
-      }
-
-      await payment.save();
+      console.log(`⏰🔒 CVU ${payment.orderId} cerrado por vencimiento`);
+    } catch (err) {
+      console.error("❌ Error cerrando CVU:", err.response?.data || err.message);
     }
+
+    await payment.save();
   }
 
   res.json(payment);
@@ -204,19 +197,22 @@ router.post("/webhooks/collection_received", async (req, res) => {
     });
 
     if (!payment) {
-      console.warn("⚠️ No se encontró pago asociado al CVU:", data.collection_account);
+      console.warn("⚠️ No se encontró pago con CVU:", data.collection_account);
       return;
     }
 
     const montoEsperado = Number(payment.amount);
     const montoRecibido = Number(data.amount);
 
-    /* ----------------- MONTO INCORRECTO → RECHAZO -----------------*/
+    // ----------------------------------------
+    // MONTO INCORRECTO → RECHAZO
+    // ----------------------------------------
     if (Math.abs(montoEsperado - montoRecibido) > 0.0001) {
       payment.status = "rechazado";
       payment.motivoRechazo = `Monto incorrecto: esperado ${montoEsperado}, recibido ${montoRecibido}`;
       await payment.save();
 
+      // devolver fondos
       try {
         await axios.post(
           `${CUCURU_BASE_URL}/Collection/reject`,
@@ -235,19 +231,22 @@ router.post("/webhooks/collection_received", async (req, res) => {
         );
       } catch {}
 
-      // Reactivar automáticamente
+      // reactivar automáticamente en 10s
       setTimeout(async () => {
         const p = await Payment.findOne({ orderId: payment.orderId });
         if (p && p.status === "rechazado") {
           p.status = "pendiente";
           await p.save();
+          console.log(`🔄 Link ${p.orderId} reactivado`);
         }
       }, 10000);
 
       return;
     }
 
-    /* ---------------- MONTO CORRECTO → COMPLETADO -----------------*/
+    // ----------------------------------------
+    // MONTO CORRECTO → COMPLETADO
+    // ----------------------------------------
     payment.status = "completado";
     payment.paymentInfo.origen = {
       titular: data.customer_name,
@@ -259,7 +258,9 @@ router.post("/webhooks/collection_received", async (req, res) => {
 
     console.log(`✅ Pago ${payment.orderId} confirmado`);
 
-    /* --------- 🔒 CERRAR CVU DESPUÉS DE PAGO CORRECTO ----------*/
+    // ----------------------------------------
+    // CERRAR CVU SÍ O SÍ (1 sola vez)
+    // ----------------------------------------
     try {
       await axios.put(
         `${CUCURU_BASE_URL}/collection/accounts/account`,
@@ -288,7 +289,7 @@ router.post("/webhooks/collection_received", async (req, res) => {
 });
 
 /* -----------------------------------------------------------
-   5) CANCELAR LINK (read_only + reject)
+   5) CANCELAR LINK (bloqueo manual)
 ------------------------------------------------------------*/
 router.post("/:orderId/cancel", async (req, res) => {
   try {
@@ -299,7 +300,7 @@ router.post("/:orderId/cancel", async (req, res) => {
       return res.status(400).json({ error: "No se puede cancelar un pago ya completado." });
     }
 
-    const { cvu, alias, customerId } = payment.paymentInfo;
+    const { cvu, customerId, alias } = payment.paymentInfo;
 
     try {
       await axios.post(
@@ -327,7 +328,6 @@ router.post("/:orderId/cancel", async (req, res) => {
     payment.status = "cancelado";
     payment.paymentInfo.bloqueado = true;
     payment.paymentInfo.cerradoEn = new Date();
-
     await payment.save();
 
     res.json({
