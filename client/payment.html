@@ -31,16 +31,17 @@
     }
 
     /* --- COLUMNA IZQUIERDA Y DERECHA --- */
-   .box, .right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: #f8f9fb;
-  border: 1px solid #dcdcdc;
-  border-radius: 8px;
-  padding: 22px;
-}
+    .box,
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #f8f9fb;
+      border: 1px solid #dcdcdc;
+      border-radius: 8px;
+      padding: 22px;
+    }
 
     .label {
       font-weight: 600;
@@ -219,7 +220,7 @@
     <div class="right">
 
       <div class="warning">
-        <b>Cuidado:</b> estos datos son exclusivos del pago.  
+        <b>Cuidado:</b> estos datos son exclusivos del pago.
         No los uses para otra operación.
       </div>
 
@@ -277,20 +278,54 @@
           /* RECHAZADO */
           if (p.status === "rechazado") {
             clearInterval(interval);
-            document.body.innerHTML = `
-              <div class="confirmado" style="border-color:#e84118;">
-                <div class="check" style="background:#e84118;">✕</div>
-                <h2>Pago Rechazado</h2>
-                <div class="grid-datos">
-                  <div>Monto esperado</div><div class="dato">$${p.amount}</div>
-                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
-                  <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto"}</div>
-                </div>
-                <div class="footer">
-                  El link se reactivará automáticamente.
-                  Volvé a transferir el monto correcto.
-                </div>
-              </div>`;
+
+            const content = document.getElementById("content");
+            content.innerHTML = `
+    <div class="confirmado" style="border-color:#e84118;">
+      <div class="check" style="background:#e84118;">✕</div>
+      <h2>Pago Rechazado</h2>
+
+      <div class="grid-datos">
+        <div>Monto esperado</div><div class="dato">$${p.amount}</div>
+        <div>ID Orden</div><div class="dato">${p.orderId}</div>
+        <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto"}</div>
+      </div>
+
+      <div class="footer">
+        El link se reactivará automáticamente en unos segundos.
+        Ingrese el mondo correcto.
+      </div>
+
+      <div id="countdown"
+           style="margin-top:12px; font-weight:600; color:#c0392b;">
+         Reactivando en 10 segundos...
+      </div>
+    </div>
+  `;
+
+            let secs = 10;
+            const countdownEl = document.getElementById("countdown");
+
+            const timer = setInterval(async () => {
+              secs--;
+              countdownEl.textContent = `Reactivando en ${secs} segundos...`;
+
+              if (secs <= 0) {
+                clearInterval(timer);
+
+                countdownEl.textContent = "Reactivando...";
+
+                const r2 = await fetch(`/api/payments/${order}`);
+                const p2 = await r2.json();
+
+                if (p2.status === "pendiente") {
+                  location.reload();
+                } else {
+                  secs = 5; // sigue intentando
+                }
+              }
+            }, 1000);
+
             return;
           }
 
