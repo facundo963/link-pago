@@ -262,7 +262,7 @@ router.post("/webhooks/collection_received", async (req, res) => {
     // CERRAR CVU SÍ O SÍ (1 sola vez)
     // ----------------------------------------
     try {
-      await axios.put(
+      await axios.post(
         `${CUCURU_BASE_URL}/collection/accounts/account`,
         {
           account_number: payment.paymentInfo.cvu,
