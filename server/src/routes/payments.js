@@ -264,10 +264,8 @@ router.post("/webhooks/collection_received", async (req, res) => {
       await axios.put(
         `${CUCURU_BASE_URL}/collection/accounts/account`,
         {
-          account_number: cvu,
-          customer_id: customerId,
-          /*account_number: payment.paymentInfo.cvu,
-          customer_id: payment.paymentInfo.customerId,*/
+          account_number: payment.paymentInfo.cvu,
+          customer_id: payment.paymentInfo.customerId,
           read_only: "true",
           on_received: "reject",
         },
