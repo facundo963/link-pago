@@ -4,317 +4,8 @@
 <head>
   <meta charset="utf-8">
   <title>Panel de Cobros</title>
-
-  <style>
-    /* =============================
-       ESTILO PROFESIONAL COMPLETO
-       ============================= */
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f1f3f5;
-      color: #333;
-    }
-
-    /* Header */
-    header {
-      background: #fff;
-      padding: 15px 30px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #222;
-    }
-
-    button#create-link {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 8px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: .2s;
-    }
-
-    button#create-link:hover {
-      background: #1e40af;
-    }
-
-    /* Main */
-    main {
-      padding: 25px 40px;
-      margin-left: 160px;
-    }
-
-    /* Tabla */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
-      overflow: hidden;
-    }
-
-    th,
-    td {
-      padding: 12px 10px;
-      font-size: 14px;
-      text-align: left;
-    }
-
-    th {
-      background: #f3f4f6;
-      color: #333;
-      font-weight: 600;
-    }
-
-    td {
-      border-top: 1px solid #e5e7eb;
-      color: #555;
-    }
-
-    tr:hover {
-      background: #f9fafb;
-    }
-
-    /* ESTADOS */
-    .estado {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      min-width: 90px;
-      display: inline-block;
-      text-align: center;
-    }
-
-    .pendiente {
-      background: #1e3a8a;
-      color: white;
-    }
-
-    .completado {
-      background: #16a34a;
-      color: white;
-    }
-
-    .expirado {
-      background: #e5e7eb;
-      color: #374151;
-      border: 1px solid #d1d5db;
-    }
-
-    .cancelado,
-    .rechazado {
-      background: #dc2626;
-      color: white;
-    }
-
-    .sobrante {
-      background: #f59e0b;
-      color: white;
-    }
-
-    .faltante {
-      background: #b91c1c;
-      color: white;
-    }
-
-    /* Botón cancelar */
-    .cancel-btn {
-      background: #dc2626;
-      color: white;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: .2s;
-    }
-
-    .cancel-btn:hover {
-      background: #b91c1c;
-    }
-
-    /* Link recortado */
-    td.link-cell {
-      position: relative;
-      width: 260px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding-right: 26px;
-    }
-
-    .copy-btn {
-      position: absolute;
-      right: 6px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #444;
-    }
-
-    .copy-btn:hover {
-      color: #2563eb;
-    }
-
-    /* Formulario nuevo link */
-    #form {
-      background: #fff;
-      padding: 18px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      display: none;
-      margin-top: 20px;
-    }
-
-    #form input,
-    #form button {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    #form button {
-      background: #16a34a;
-      color: white;
-      font-weight: 600;
-      border: none;
-      transition: .2s;
-    }
-
-    #form button:hover {
-      background: #15803d;
-    }
-
-    /* Sidebar */
-    #sidebar {
-      position: fixed;
-      left: 10px;
-      top: 100px;
-      width: 120px;
-      background: white;
-      border-radius: 12px;
-      padding: 15px 0;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .side-btn {
-      background: none;
-      border: none;
-      font-size: 18px;
-      color: #1f2937;
-      cursor: pointer;
-      transition: .2s;
-      text-align: center;
-    }
-
-    .side-btn span {
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .side-btn:hover {
-      transform: scale(1.05);
-      color: #2563eb;
-    }
-
-    /* POPUP CANCELAR */
-    #cancel-popup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      animation: fadeInPopup .25s ease;
-    }
-
-    @keyframes fadeInPopup {
-      from {
-        opacity: 0
-      }
-
-      to {
-        opacity: 1
-      }
-    }
-
-    @keyframes scaleIn {
-      from {
-        transform: scale(0.85);
-        opacity: 0
-      }
-
-      to {
-        transform: scale(1);
-        opacity: 1
-      }
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      #sidebar {
-        display: none;
-      }
-
-      main {
-        margin-left: 0;
-        padding: 20px;
-      }
-    }
-
-    @media (max-width: 700px) {
-      table {
-        display: block;
-        overflow-x: auto;
-      }
-
-      th,
-      td {
-        padding: 8px;
-        font-size: 12px;
-      }
-
-      button#create-link {
-        font-size: 12px;
-        padding: 6px 12px;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
@@ -322,7 +13,26 @@
   <header>
     <h1>Panel de Cobros</h1>
     <button id="create-link">+ Crear link de pago</button>
+    <button id="config-btn">⚙️ Configuración</button>
   </header>
+
+  <!-- PANEL CONFIGURACIÓN -->
+  <div id="config-panel">
+    <h2>Configuración del Comercio</h2>
+
+    <label>API Key</label>
+    <input id="cfg-api">
+
+    <label>Collector ID</label>
+    <input id="cfg-collector">
+
+    <label>Prefijo Alias</label>
+    <input id="cfg-prefix">
+
+    <button id="cfg-save">Guardar</button>
+    <button id="cfg-close">Cerrar</button>
+  </div>
+
 
   <main>
 
@@ -383,107 +93,116 @@
     </div>
   </div>
 
+  
+
   <!-- =============================
        SCRIPT ORIGINAL - SIN CAMBIOS
        ============================= -->
   <script>
-    const API = '/api/payments';
+  const API = '/api/payments';
+  const MERCHANT_ID = merchantId = localStorage.getItem('merchantId');
 
-    document.getElementById('create-link').onclick = () => {
-      const form = document.getElementById('form');
-      form.style.display = form.style.display === 'block' ? 'none' : 'block';
-    };
+  document.getElementById('create-link').onclick = () => {
+    const form = document.getElementById('form');
+    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+  };
 
-    document.getElementById('create').onclick = async () => {
-      const btn = document.getElementById('create');
-      btn.disabled = true;
-      btn.textContent = 'Creando Link de pago...';
+  document.getElementById('create').onclick = async () => {
+    const btn = document.getElementById('create');
+    btn.disabled = true;
+    btn.textContent = 'Creando Link de pago...';
 
-      const amount = parseFloat(document.getElementById('amount').value);
-      const desc = document.getElementById('desc').value;
-      const email = document.getElementById('email').value;
-      const hours = parseFloat(document.getElementById('hours').value) || 1;
+    const amount = parseFloat(document.getElementById('amount').value);
+    const desc = document.getElementById('desc').value;
+    const email = document.getElementById('email').value;
+    const hours = parseFloat(document.getElementById('hours').value) || 1;
 
-      if (!amount || !desc) {
-        showAdvertencia(`⚠️ Complete el campo Monto y Descripción`);
-        btn.disabled = false;
-        btn.textContent = 'Confirmar';
-        return;
-      }
-
-      const res = await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, description: desc, customerEmail: email, expiresInHours: hours })
-      });
-
-      const json = await res.json();
-
-      if (json.orderId) {
-        showNotice(`✅ Link creado correctamente`);
-        loadList();
-        document.getElementById('form').style.display = 'none';
-        document.getElementById('amount').value = '';
-        document.getElementById('desc').value = '';
-        document.getElementById('email').value = '';
-        document.getElementById('hours').value = '';
-      } else {
-        showAdvertencia(`❌ Error creando link: ${json.message || 'Intente nuevamente'}`);
-      }
-
+    if (!amount || !desc) {
+      showAdvertencia(`⚠️ Complete el campo Monto y Descripción`);
       btn.disabled = false;
       btn.textContent = 'Confirmar';
-    };
-
-    function showAdvertencia(msg) {
-      let advertencia = document.getElementById('advertencia');
-      if (!advertencia) {
-        advertencia = document.createElement('div');
-        advertencia.id = 'advertencia';
-        advertencia.style = `
-          background: #fff3cd;
-          border: 1px solid #ffeeba;
-          padding: 10px 15px;
-          border-radius: 6px;
-          margin-top: 15px;
-          color: #856404;
-          font-weight: 500;
-          animation: fadeIn 0.3s ease;
-        `;
-        document.querySelector('main').prepend(advertencia);
-      }
-      advertencia.innerHTML = msg;
-      advertencia.style.display = 'block';
-      setTimeout(() => advertencia.style.display = 'none', 4000);
+      return;
     }
 
-    function showNotice(msg) {
-      let notice = document.getElementById('notice');
-      if (!notice) {
-        notice = document.createElement('div');
-        notice.id = 'notice';
-        notice.style = `
-          background: #e6ffe6;
-          border: 1px solid #00aa00;
-          padding: 10px 15px;
-          border-radius: 6px;
-          margin-top: 15px;
-          color: #008000;
-          font-weight: 500;
-          animation: fadeIn 0.3s ease;
-        `;
-        document.querySelector('main').prepend(notice);
-      }
-      notice.innerHTML = msg;
-      notice.style.display = 'block';
-      setTimeout(() => notice.style.display = 'none', 4000);
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount,
+        description: desc,
+        customerEmail: email,
+        expiresInHours: hours,
+        merchantId: MERCHANT_ID
+      })
+    });
+
+    const json = await res.json();
+
+    if (json.orderId) {
+      showNotice(`✅ Link creado correctamente`);
+      loadList();
+      document.getElementById('form').style.display = 'none';
+      document.getElementById('amount').value = '';
+      document.getElementById('desc').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('hours').value = '';
+    } else {
+      showAdvertencia(`❌ Error creando link: ${json.error || 'Intente nuevamente'}`);
     }
 
-    async function loadList() {
-      const res = await fetch(API + '/all');
-      const arr = await res.json();
-      const table = document.getElementById('list');
-      table.innerHTML = `
+    btn.disabled = false;
+    btn.textContent = 'Confirmar';
+  };
+
+  function showAdvertencia(msg) {
+    let advertencia = document.getElementById('advertencia');
+    if (!advertencia) {
+      advertencia = document.createElement('div');
+      advertencia.id = 'advertencia';
+      advertencia.style = `
+        background: #fff3cd;
+        border: 1px solid #ffeeba;
+        padding: 10px 15px;
+        border-radius: 6px;
+        margin-top: 15px;
+        color: #856404;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease;
+      `;
+      document.querySelector('main').prepend(advertencia);
+    }
+    advertencia.innerHTML = msg;
+    advertencia.style.display = 'block';
+    setTimeout(() => advertencia.style.display = 'none', 4000);
+  }
+
+  function showNotice(msg) {
+    let notice = document.getElementById('notice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'notice';
+      notice.style = `
+        background: #e6ffe6;
+        border: 1px solid #00aa00;
+        padding: 10px 15px;
+        border-radius: 6px;
+        margin-top: 15px;
+        color: #008000;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease;
+      `;
+      document.querySelector('main').prepend(notice);
+    }
+    notice.innerHTML = msg;
+    notice.style.display = 'block';
+    setTimeout(() => notice.style.display = 'none', 4000);
+  }
+
+  async function loadList() {
+    const res = await fetch(API + '/all?merchantId=' + MERCHANT_ID);
+    const arr = await res.json();
+    const table = document.getElementById('list');
+    table.innerHTML = `
       <tr>
         <th>Estado</th>
         <th>ID</th>
@@ -493,12 +212,12 @@
         <th>Acciones</th>
       </tr>`;
 
-      arr.forEach(p => {
-        const tr = document.createElement('tr');
-        let estadoClass = p.status;
+    arr.forEach(p => {
+      const tr = document.createElement('tr');
+      let estadoClass = p.status;
 
-        const paymentUrl = `${window.location.origin}/payment.html?order=${p.orderId}`;
-        tr.innerHTML = `
+      const paymentUrl = `${window.location.origin}/payment.html?order=${p.orderId}`;
+      tr.innerHTML = `
         <td><span class="estado ${estadoClass}">${p.status}</span></td>
         <td>${p.orderId}</td>
         <td>$${p.amount}</td>
@@ -513,52 +232,117 @@
             : '-'}
         </td>
       `;
-        table.appendChild(tr);
-      });
+      table.appendChild(tr);
+    });
 
-      document.querySelectorAll('.side-btn')[0].onclick = () =>
-        loadList() & showNotice('🔄 Lista actualizada');
+    document.querySelectorAll('.side-btn')[0].onclick = () =>
+      loadList() & showNotice('🔄 Lista actualizada');
 
-      document.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.onclick = () => {
-          navigator.clipboard.writeText(btn.dataset.link);
-          btn.textContent = '✅';
-          setTimeout(() => btn.textContent = '📋', 1600);
-        };
-      });
-    }
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.onclick = () => {
+        navigator.clipboard.writeText(btn.dataset.link);
+        btn.textContent = '✅';
+        setTimeout(() => btn.textContent = '📋', 1600);
+      };
+    });
+  }
 
-    let cancelOrderId = null;
+  let cancelOrderId = null;
 
-    function cancelarPago(orderId) {
-      cancelOrderId = orderId;
-      const popup = document.getElementById("cancel-popup");
-      popup.style.display = "flex";
+  function cancelarPago(orderId) {
+    cancelOrderId = orderId;
+    const popup = document.getElementById("cancel-popup");
+    popup.style.display = "flex";
 
-      document.getElementById("cancel-no").onclick = () => {
+    document.getElementById("cancel-no").onclick = () => {
+      popup.style.display = "none";
+    };
+
+    document.getElementById("cancel-yes").onclick = async () => {
+      try {
+        const res = await fetch(`/api/payments/${cancelOrderId}/cancel`, { method: "POST" });
+        const data = await res.json();
         popup.style.display = "none";
-      };
 
-      document.getElementById("cancel-yes").onclick = async () => {
-        try {
-          const res = await fetch(`/api/payments/${cancelOrderId}/cancel`, { method: "POST" });
-          const data = await res.json();
-          popup.style.display = "none";
+        if (data.success) {
+          showNotice("✅ Link cerrado correctamente.");
+          loadList();
+        } else showAdvertencia(data.error || "No se pudo cancelar el link.");
 
-          if (data.success) {
-            showNotice("✅ Link cerrado correctamente.");
-            loadList();
-          } else showAdvertencia(data.error || "No se pudo cancelar el link.");
+      } catch (err) {
+        popup.style.display = "none";
+        showAdvertencia("⚠️ Error de conexión.");
+      }
+    };
+  }
 
-        } catch (err) {
-          popup.style.display = "none";
-          showAdvertencia("⚠️ Error de conexión.");
-        }
-      };
-    }
+   // abrir panel
+  document.getElementById("config-btn").onclick = () => {
+  document.getElementById("config-panel").classList.add("open");
+};
 
-    loadList();
-  </script>
+document.getElementById("cfg-close").onclick = () => {
+  document.getElementById("config-panel").classList.remove("open");
+};
+
+// Cargar datos guardados
+function loadConfig() {
+  document.getElementById("cfg-api").value =
+    localStorage.getItem("cfg_apiKey") || "";
+
+  document.getElementById("cfg-collector").value =
+    localStorage.getItem("cfg_collectorId") || "";
+
+  document.getElementById("cfg-prefix").value =
+    localStorage.getItem("cfg_aliasPrefix") || "";
+}
+
+loadConfig();
+
+document.getElementById("cfg-save").onclick = async () => {
+  const cucuruApiKey = document.getElementById("cfg-api").value.trim();
+  const cucuruCollectorId = document.getElementById("cfg-collector").value.trim();
+  const aliasPrefix = document.getElementById("cfg-prefix").value.trim();
+
+  if (!cucuruApiKey || !cucuruCollectorId || !aliasPrefix) {
+    showAdvertencia("⚠️ Completá todos los campos");
+    return;
+  }
+
+  // Crear comercio en backend
+  const res = await fetch("/api/clients", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: cucuruCollectorId,
+      cucuruApiKey,
+      cucuruCollectorId,
+      aliasPrefix
+    })
+  });
+
+  const json = await res.json();
+
+  if (json._id) {
+    // Guardar merchantId real
+    localStorage.setItem("merchantId", json._id);
+
+    // Guardar lo que escribió el usuario
+    localStorage.setItem("cfg_apiKey", cucuruApiKey);
+    localStorage.setItem("cfg_collectorId", cucuruCollectorId);
+    localStorage.setItem("cfg_aliasPrefix", aliasPrefix);
+
+    showNotice("✅ Configuración guardada");
+    document.getElementById("config-panel").classList.remove("open");
+  } else {
+    showAdvertencia("❌ Error guardando configuración");
+  }
+};
+  
+  loadList();
+</script>
+
+
 
 </body>
 

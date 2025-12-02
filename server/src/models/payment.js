@@ -15,6 +15,12 @@ const paymentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   expiresAt: Date,
   paymentInfo: Object, //alias, cuit, cvu, titular.
+  merchantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Client",
+    required: true
+  }
+
   
 });
 module.exports = mongoose.model("Payment", paymentSchema);

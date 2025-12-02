@@ -1,0 +1,177 @@
+body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f5f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      margin: 10px auto 20px auto;
+      color: #2f3640;
+      max-width: 1000px;
+    }
+
+    /* --- CONTENEDOR PRINCIPAL --- */
+    .container {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 25px;
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      gap: 24px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* --- COLUMNA IZQUIERDA Y DERECHA --- */
+    .box,
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #f8f9fb;
+      border: 1px solid #dcdcdc;
+      border-radius: 8px;
+      padding: 22px;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    .value {
+      background: #eef2f7;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-top: 5px;
+      font-size: 15px;
+    }
+
+    /* --- ADVERTENCIA --- */
+    .warning {
+      border-left: 4px solid #e84118;
+      background: #fff5f5;
+      color: #c23616;
+      padding: 15px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* --- CAJAS DE COPIA --- */
+    .copy-box {
+      border: 1px solid #d3d3ee;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-size: 15px;
+      color: #2f3640;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbff;
+    }
+
+    .copy-btn {
+      border: none;
+      background: none;
+      color: #e84118;
+      font-size: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .copy-btn:hover {
+      color: #c0392b;
+      transform: scale(1.1);
+    }
+
+    /* --- BOTÓN PRINCIPAL --- */
+    .btn-pago {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      margin-top: 30px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-pago:hover {
+      background: #0056b3;
+    }
+
+    /* --- MENSAJES DE ESTADOS (CONFIRMADO, CANCELADO, ETC.) --- */
+    .confirmado {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .confirmado h2 {
+      margin: 0 0 12px 0;
+      color: #2f3640;
+    }
+
+    .check {
+      width: 60px;
+      height: 60px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      color: #fff;
+      margin: 10px auto;
+    }
+
+    .grid-datos {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px 16px;
+      text-align: left;
+      margin: 20px auto;
+      max-width: 500px;
+    }
+
+    .dato {
+      background: #eef2f7;
+      border-radius: 6px;
+      padding: 8px 14px;
+    }
+
+    .footer {
+      margin-top: 14px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    /* -------- RESPONSIVE -------- */
+    @media (max-width: 880px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .grid-datos {
+        grid-template-columns: 1fr;
+      }
+
+      body {
+        padding: 10px;
+      }
+
+      h2 {
+        padding-left: 6px;
+      }
+    }

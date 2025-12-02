@@ -1,0 +1,358 @@
+
+    /* =============================
+       ESTILO PROFESIONAL COMPLETO
+       ============================= */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f3f5;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background: #fff;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #222;
+    }
+
+    button#create-link {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: .2s;
+    }
+
+    button#create-link:hover {
+      background: #1e40af;
+    }
+
+    /* Main */
+    main {
+      padding: 25px 40px;
+      margin-left: 160px;
+    }
+
+    /* Tabla */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #f3f4f6;
+      color: #333;
+      font-weight: 600;
+    }
+
+    td {
+      border-top: 1px solid #e5e7eb;
+      color: #555;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    /* ESTADOS */
+    .estado {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 90px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .pendiente {
+      background: #1e3a8a;
+      color: white;
+    }
+
+    .completado {
+      background: #16a34a;
+      color: white;
+    }
+
+    .expirado {
+      background: #e5e7eb;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .cancelado,
+    .rechazado {
+      background: #dc2626;
+      color: white;
+    }
+
+    .sobrante {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .faltante {
+      background: #b91c1c;
+      color: white;
+    }
+
+    /* Botón cancelar */
+    .cancel-btn {
+      background: #dc2626;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: .2s;
+    }
+
+    .cancel-btn:hover {
+      background: #b91c1c;
+    }
+
+    /* Link recortado */
+    td.link-cell {
+      position: relative;
+      width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 26px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #444;
+    }
+
+    .copy-btn:hover {
+      color: #2563eb;
+    }
+
+    /* Formulario nuevo link */
+    #form {
+      background: #fff;
+      padding: 18px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      display: none;
+      margin-top: 20px;
+    }
+
+    #form input,
+    #form button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    #form button {
+      background: #16a34a;
+      color: white;
+      font-weight: 600;
+      border: none;
+      transition: .2s;
+    }
+
+    #form button:hover {
+      background: #15803d;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      position: fixed;
+      left: 10px;
+      top: 100px;
+      width: 120px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px 0;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .side-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #1f2937;
+      cursor: pointer;
+      transition: .2s;
+      text-align: center;
+    }
+
+    .side-btn span {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .side-btn:hover {
+      transform: scale(1.05);
+      color: #2563eb;
+    }
+
+    /* POPUP CANCELAR */
+    #cancel-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeInPopup .25s ease;
+    }
+
+    #config-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 350px;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+  padding: 25px;
+  transition: .3s;
+  z-index: 9999;
+}
+
+#config-panel.open {
+  right: 0;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#config-panel input {
+  padding: 10px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+}
+
+#config-panel button {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#cfg-save {
+  background: #2563eb;
+  color: #fff;
+}
+
+.close-btn {
+  background: #b2bec3;
+  color: #2d3436;
+}
+
+
+    @keyframes fadeInPopup {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.85);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      #sidebar {
+        display: none;
+      }
+
+      main {
+        margin-left: 0;
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      button#create-link {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+    }
+  

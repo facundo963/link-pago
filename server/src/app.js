@@ -6,6 +6,7 @@ const path = require('path');
 
 const paymentRoutes = require('./routes/payments');
 
+
 const app = express();
 
 // CORS
@@ -17,6 +18,7 @@ app.use(express.json());
 
 //  Rutas API
 app.use('/api/payments', paymentRoutes);
+app.use('/api/clients', require('./routes/clients'));
 
 //Servir frontend (client está 2 niveles arriba del archivo actual)
 const clientPath = path.join(__dirname, '../../client');
