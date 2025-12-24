@@ -1,62 +1,83 @@
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8">
   <title>Pago - Link de Pago</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/payment.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 </head>
 
 <body>
 
-  <h2>Hace tu pago</h2>
+  <h2 class="main-title">Finaliza tu pago</h2>
 
   <div class="container" id="content">
 
-    <!-- COLUMNA IZQUIERDA -->
     <div class="box">
-      <div class="label">Monto</div>
-      <div class="value" id="monto">$—</div>
+      <div class="info-group">
+        <div class="label">Monto a pagar</div>
+        <div class="value amount-value" id="monto">$—</div>
+      </div>
 
-      <div class="label">Descripción</div>
-      <div class="value" id="desc">—</div>
+      <div class="info-group">
+        <div class="label">Descripción</div>
+        <div class="value" id="desc">—</div>
+      </div>
 
-      <div class="label">Vencimiento</div>
-      <div class="value" id="vence">—</div>
+      <div class="info-group">
+        <div class="label">Vencimiento</div>
+        <div class="value date-value" id="vence">—</div>
+      </div>
 
-      <div class="label">Titular</div>
-      <div class="value" id="titular">—</div>
+      <div class="info-group">
+        <div class="label">Titular de cuenta</div>
+        <div class="value" id="titular">—</div>
+      </div>
 
-      <div class="label">Email cliente</div>
-      <div class="value" id="email">—</div>
+      <div class="info-group">
+        <div class="label">Email del cliente</div>
+        <div class="value" id="email">—</div>
+      </div>
 
-      <div class="label">ID Orden</div>
-      <div class="value" id="orden">—</div>
+      <div class="info-group">
+        <div class="label">ID de Orden</div>
+        <div class="value" id="orden">—</div>
+      </div>
 
       <button class="btn-pago" id="paid" disabled>
-        Esperando confirmación...
+        <span class="spinner"></span> Esperando confirmación...
       </button>
     </div>
 
-    <!-- COLUMNA DERECHA -->
     <div class="right">
-
       <div class="warning">
-        <b>Cuidado:</b> estos datos son exclusivos del pago.
-        No los uses para otra operación.
+        <div class="warning-icon">⚠️</div>
+        <div>
+          <b>Atención:</b> estos datos son exclusivos para esta operación. 
+          No los utilices para transferencias futuras.
+        </div>
       </div>
 
-      <div class="copy-box">
-        <span><b>Alias:</b> <span id="alias">---</span></span>
-        <button class="copy-btn" data-target="alias">📋</button>
+      <div class="copy-section">
+        <div class="label">Alias de transferencia</div>
+        <div class="copy-box">
+          <span id="alias">---</span>
+          <button class="copy-btn" data-target="alias" title="Copiar Alias">📋</button>
+        </div>
       </div>
 
-      <div class="copy-box">
-        <span><b>CVU:</b> <span id="cvu">---</span></span>
-        <button class="copy-btn" data-target="cvu">📋</button>
+      <div class="copy-section">
+        <div class="label">CVU / CBU</div>
+        <div class="copy-box">
+          <span id="cvu">---</span>
+          <button class="copy-btn" data-target="cvu" title="Copiar CVU">📋</button>
+        </div>
       </div>
 
+      <div class="secure-badge">
+        🛡️ Pago procesado de forma segura
+      </div>
     </div>
 
   </div>

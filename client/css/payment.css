@@ -1,177 +1,157 @@
+/* =========================================
+   ESTILO PROFESIONAL - VENTANA DE PAGO
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f5f8;
-      margin: 0;
-      padding: 20px;
-    }
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: #f4f7fe;
+  margin: 0;
+  padding: 40px 20px;
+  color: #1b2559;
+}
 
-    h2 {
-      margin: 10px auto 20px auto;
-      color: #2f3640;
-      max-width: 1000px;
-    }
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 700;
+  color: #1b2559;
+  letter-spacing: -0.5px;
+}
 
-    /* --- CONTENEDOR PRINCIPAL --- */
-    .container {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 25px;
-      max-width: 820px;
-      margin: 0 auto;
-      display: flex;
-      gap: 24px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
+/* --- CONTENEDOR PRINCIPAL --- */
+.container {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 35px;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 30px;
+  box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.05);
+}
 
-    /* --- COLUMNA IZQUIERDA Y DERECHA --- */
-    .box,
-    .right {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      background: #f8f9fb;
-      border: 1px solid #dcdcdc;
-      border-radius: 8px;
-      padding: 22px;
-    }
+/* --- COLUMNAS --- */
+.box, .right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #f1f4f9;
+  border-radius: 16px;
+  padding: 24px;
+}
 
-    .label {
-      font-weight: 600;
-      color: #333;
-      margin-top: 10px;
-    }
+/* Columna derecha ligeramente diferente para resaltar */
+.right {
+  background: #fcfdfe;
+  border: 1px solid #e0e5f2;
+}
 
-    .value {
-      background: #eef2f7;
-      padding: 10px 15px;
-      border-radius: 8px;
-      margin-top: 5px;
-      font-size: 15px;
-    }
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #a3aed0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
+}
 
-    /* --- ADVERTENCIA --- */
-    .warning {
-      border-left: 4px solid #e84118;
-      background: #fff5f5;
-      color: #c23616;
-      padding: 15px 12px;
-      border-radius: 6px;
-      font-size: 14px;
-    }
+.value {
+  background: #f4f7fe;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b2559;
+  border: 1px solid transparent;
+}
 
-    /* --- CAJAS DE COPIA --- */
-    .copy-box {
-      border: 1px solid #d3d3ee;
-      padding: 10px 15px;
-      border-radius: 6px;
-      font-size: 15px;
-      color: #2f3640;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #fafbff;
-    }
+/* --- ADVERTENCIA --- */
+.warning {
+  border-left: 4px solid #ee5d50;
+  background: #fff5f5;
+  color: #ee5d50;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
 
-    .copy-btn {
-      border: none;
-      background: none;
-      color: #e84118;
-      font-size: 20px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+/* --- CAJAS DE COPIA --- */
+.copy-box {
+  background: #ffffff;
+  border: 1px solid #e0e5f2;
+  padding: 14px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
 
-    .copy-btn:hover {
-      color: #c0392b;
-      transform: scale(1.1);
-    }
+.copy-box:hover {
+  border-color: #4318ff;
+  background: #f9faff;
+}
 
-    /* --- BOTÓN PRINCIPAL --- */
-    .btn-pago {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 15px;
-      margin-top: 30px;
-      width: 100%;
-      text-align: center;
-    }
+.copy-box span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #1b2559;
+}
 
-    .btn-pago:hover {
-      background: #0056b3;
-    }
+.copy-btn {
+  border: none;
+  background: #f4f7fe;
+  color: #4318ff;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
 
-    /* --- MENSAJES DE ESTADOS (CONFIRMADO, CANCELADO, ETC.) --- */
-    .confirmado {
-      background: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
+.copy-btn:hover {
+  background: #4318ff;
+  color: #ffffff;
+}
 
-    .confirmado h2 {
-      margin: 0 0 12px 0;
-      color: #2f3640;
-    }
+/* --- BOTÓN DE ESTADO --- */
+.btn-pago {
+  background: #4318ff;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  width: 100%;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 12px rgba(67, 24, 255, 0.2);
+}
 
-    .check {
-      width: 60px;
-      height: 60px;
-      background: #22c55e;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      color: #fff;
-      margin: 10px auto;
-    }
+.btn-pago:hover {
+  background: #3311cc;
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 20px rgba(67, 24, 255, 0.3);
+}
 
-    .grid-datos {
-      display: grid;
-      grid-template-columns: 180px 1fr;
-      gap: 10px 16px;
-      text-align: left;
-      margin: 20px auto;
-      max-width: 500px;
-    }
-
-    .dato {
-      background: #eef2f7;
-      border-radius: 6px;
-      padding: 8px 14px;
-    }
-
-    .footer {
-      margin-top: 14px;
-      color: #555;
-      font-size: 14px;
-    }
-
-    /* -------- RESPONSIVE -------- */
-    @media (max-width: 880px) {
-      .container {
-        flex-direction: column;
-      }
-
-      .grid-datos {
-        grid-template-columns: 1fr;
-      }
-
-      body {
-        padding: 10px;
-      }
-
-      h2 {
-        padding-left: 6px;
-      }
-    }
+/* --- RESPONSIVE --- */
+@media (max-width: 880px) {
+  .container {
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  body {
+    padding: 20px 10px;
+  }
+}

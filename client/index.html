@@ -17,21 +17,34 @@
   </header>
 
   <!-- PANEL CONFIGURACIÓN -->
-  <div id="config-panel">
+  <div id="config-panel" class="modal-overlay-config">
+  <div class="modal-content-config">
     <h2>Configuración del Comercio</h2>
+    
+    <div class="input-group">
+      <label>API Key</label>
+      <div class="password-wrapper">
+        <input type="password" id="cfg-api" placeholder="X-Cucuru-Api-Key">
+        <button type="button" id="toggle-password" class="eye-btn">👁️</button>
+      </div>
+    </div>
 
-    <label>API Key</label>
-    <input id="cfg-api">
+    <div class="input-group">
+      <label>Collector ID</label>
+      <input id="cfg-collector" placeholder="ID del recaudador (ej: FacuTest)">
+    </div>
 
-    <label>Collector ID</label>
-    <input id="cfg-collector">
+    <div class="input-group">
+      <label>Prefijo Alias</label>
+      <input id="cfg-prefix" placeholder="Ej: Pepsi">
+    </div>
 
-    <label>Prefijo Alias</label>
-    <input id="cfg-prefix">
-
-    <button id="cfg-save">Guardar</button>
-    <button id="cfg-close">Cerrar</button>
+    <div class="modal-actions-config">
+      <button id="cfg-close" class="btn-sec-config">Cerrar</button>
+      <button id="cfg-save" class="btn-pri-config">Guardar Configuración</button>
+    </div>
   </div>
+</div>
 
 
   <main>
@@ -277,12 +290,24 @@
   }
 
    // abrir panel
-  document.getElementById("config-btn").onclick = () => {
-  document.getElementById("config-panel").classList.add("open");
+ document.getElementById("config-btn").onclick = () => {
+  document.getElementById("config-panel").style.display = "flex";
 };
 
 document.getElementById("cfg-close").onclick = () => {
-  document.getElementById("config-panel").classList.remove("open");
+  document.getElementById("config-panel").style.display = "none";
+};
+
+// LÓGICA DEL OJO (MOSTRAR/OCULTAR)
+document.getElementById("toggle-password").onclick = function() {
+  const apiInput = document.getElementById("cfg-api");
+  if (apiInput.type === "password") {
+    apiInput.type = "text";
+    this.textContent = "🙈";
+  } else {
+    apiInput.type = "password";
+    this.textContent = "👁️";
+  }
 };
 
 // Cargar datos guardados
@@ -331,6 +356,7 @@ document.getElementById("cfg-save").onclick = async () => {
     localStorage.setItem("cfg_apiKey", cucuruApiKey);
     localStorage.setItem("cfg_collectorId", cucuruCollectorId);
     localStorage.setItem("cfg_aliasPrefix", aliasPrefix);
+    window.merchantId = json._id;
 
     showNotice("✅ Configuración guardada");
     document.getElementById("config-panel").classList.remove("open");
