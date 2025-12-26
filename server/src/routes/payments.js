@@ -237,6 +237,12 @@ router.post("/webhooks/collection_received", async (req, res) => {
 
   try {
     const data = req.body;
+    console.log("📬 Webhook recibido:", data);
+
+    if (data.amount === 0) {
+      console.log(" validacion exitosa.");
+      return;
+    }
 
     const payment = await Payment.findOne({
       $or: [
@@ -291,7 +297,7 @@ router.post("/webhooks/collection_received", async (req, res) => {
       return;
     }
 
-    // ✔️ MONTO CORRECTO → COMPLETADO
+    // MONTO CORRECTO → COMPLETADO
     payment.status = "completado";
     payment.paymentInfo.origen = {
       titular: data.customer_name,
