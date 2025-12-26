@@ -232,7 +232,7 @@ router.get("/:orderId", async (req, res) => {
 /* -----------------------------------------------------------
    4) WEBHOOK COBRO RECIBIDO
 ------------------------------------------------------------*/
-router.post("/webhooks/collection_received", async (req, res) => {
+router.post("/collection_received", async (req, res) => {
   res.sendStatus(200);
 
   try {
