@@ -144,6 +144,63 @@ h2 {
   box-shadow: 0px 6px 20px rgba(67, 24, 255, 0.3);
 }
 
+/* --- ESTADOS DE FINALIZACIÓN --- */
+.confirmado-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  margin: 40px auto;
+  text-align: center;
+  box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f4f9;
+}
+
+.check-circle {
+  width: 80px;
+  height: 80px;
+  background: #05cd99;
+  color: white;
+  font-size: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.grid-confirmacion {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  text-align: left;
+  margin-top: 25px;
+  padding: 20px;
+  background: #f4f7fe;
+  border-radius: 16px;
+}
+
+.dato-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #a3aed0;
+  text-transform: uppercase;
+}
+
+.dato-valor {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b2559;
+  text-align: right;
+}
+
+.footer-msg {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #a3aed0;
+}
+
 /* --- RESPONSIVE --- */
 @media (max-width: 880px) {
   .container {

@@ -191,20 +191,30 @@
 
           /* COMPLETADO */
           if (p.status === "completado") {
-            clearInterval(interval);
-            document.body.innerHTML = `
-              <div class="confirmado">
-                <div class="check">✓</div>
-                <h2>Pago Confirmado</h2>
-                <div class="grid-datos">
-                  <div>Monto</div><div class="dato">$${p.amount}</div>
-                  <div>Descripción</div><div class="dato">${p.description || "-"}</div>
-                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
-                </div>
-                <div class="footer">Gracias por tu compra.</div>
-              </div>`;
-            return;
-          }
+  clearInterval(interval);
+  document.body.innerHTML = `
+    <div class="confirmado-card">
+      <div class="check-circle">✓</div>
+      <h2 style="margin-bottom: 5px;">¡Pago Confirmado!</h2>
+      <p style="color: #a3aed0; font-size: 14px;">Hemos recibido tu transferencia con éxito.</p>
+      
+      <div class="grid-confirmacion">
+        <div class="dato-label">Monto Recibido</div>
+        <div class="dato-valor" style="color: #05cd99;">$${p.amount}</div>
+        
+        <div class="dato-label">Descripción</div>
+        <div class="dato-valor">${p.description || "-"}</div>
+        
+        <div class="dato-label">ID Orden</div>
+        <div class="dato-valor">${p.orderId}</div>
+      </div>
+      
+      <div class="footer-msg">
+        Gracias por tu compra. Ya puedes cerrar esta ventana. [cite: 118]
+      </div>
+    </div>`;
+  return;
+}
 
           /* DATOS DEL PAGO */
           document.getElementById("monto").textContent = `$${p.amount}`;
