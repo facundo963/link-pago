@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <title>Pago - Link de Pago</title>
@@ -54,7 +55,7 @@
       <div class="warning">
         <div class="warning-icon">⚠️</div>
         <div>
-          <b>Atención:</b> estos datos son exclusivos para esta operación. 
+          <b>Atención:</b> estos datos son exclusivos para esta operación.
           No los utilices para transferencias futuras.
         </div>
       </div>
@@ -105,94 +106,99 @@
 
           /* CANCELADO */
           if (p.status === "cancelado") {
-            clearInterval(interval);
-            document.body.innerHTML = `
-              <div class="confirmado">
-                <div class="check" style="background:none;">🚫</div>
-                <h2>Link Cancelado</h2>
-                <div class="grid-datos">
-                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
-                  <div>Alias</div><div class="dato">${p.paymentInfo?.alias || "-"}</div>
-                </div>
-                <div class="footer">Este link ya no acepta transferencias.</div>
-              </div>`;
-            return;
-          }
+          clearInterval(interval);
+          document.body.innerHTML = `
+          <div class="cancel-circle">🚫</div>
+          <h2 style="color: #1b2559; margin-bottom: 5px;">Link Cancelado</h2>
+          <p style="color: #a3aed0; font-size: 14px;">Este link de pago ha sido desactivado por el comercio.</p>
+          
+          <div class="grid-cancelado">
+            <div class="dato-label">ID Orden</div>
+            <div class="dato-valor">${p.orderId}</div>
+            
+            <div class="dato-label">Alias</div>
+            <div class="dato-valor" style="font-size: 12px;">${p.paymentInfo?.alias || "-"}</div>
+            </div>
+            
+            <p class="footer-msg" style="margin-top: 25px;">
+              Cualquier transferencia enviada a estos datos será rechazada automáticamente[cite: 391, 507].
+              </p>
+              <div class="cancelado-card">
+                </div>`;
+                return;
+              }
 
           /* RECHAZADO */
           if (p.status === "rechazado") {
             clearInterval(interval);
+            document.body.innerHTML = `
+    <div class="rechazado-card">
+      <div class="error-circle">✕</div>
+      <h2 style="color: #1b2559; margin-bottom: 5px;">Pago Rechazado</h2>
+      <p style="color: #a3aed0; font-size: 14px;">El monto transferido no coincide con el solicitado.</p>
+      
+      <div class="grid-rechazo">
+        <div class="dato-label">Monto Solicitado</div>
+        <div class="dato-valor" style="color: #1b2559;">$${p.amount}</div>
+        
+        <div class="dato-label">Motivo</div>
+        <div class="dato-valor" style="color: #ee5d50;">${p.motivoRechazo || "Importe inválido"}</div>
 
-            const content = document.getElementById("content");
-            content.innerHTML = `
-    <div class="confirmado" style="border-color:#e84118;">
-      <div class="check" style="background:#e84118;">✕</div>
-      <h2>Pago Rechazado</h2>
-
-      <div class="grid-datos">
-        <div>Monto esperado</div><div class="dato">$${p.amount}</div>
-        <div>ID Orden</div><div class="dato">${p.orderId}</div>
-        <div>Motivo</div><div class="dato">${p.motivoRechazo || "Monto incorrecto"}</div>
+        <div class="dato-label">ID Orden</div>
+        <div class="dato-valor">${p.orderId}</div>
       </div>
+      
+      <p style="margin-top:20px; font-size: 13px; color: #a3aed0;">
+        La transferencia será devuelta automáticamente por el sistema.
+      </p>
 
-      <div class="footer">
-        El link se reactivará automáticamente en unos segundos.
-        Ingrese el mondo correcto.
+      <div id="countdown" class="timer-badge">
+        Reactivando en 10 segundos...
       </div>
-
-      <div id="countdown"
-           style="margin-top:12px; font-weight:600; color:#c0392b;">
-         Reactivando en 10 segundos...
-      </div>
-    </div>
-  `;
+    </div>`;
 
             let secs = 10;
             const countdownEl = document.getElementById("countdown");
-
             const timer = setInterval(async () => {
               secs--;
               countdownEl.textContent = `Reactivando en ${secs} segundos...`;
-
               if (secs <= 0) {
                 clearInterval(timer);
-
                 countdownEl.textContent = "Reactivando...";
-
-                const r2 = await fetch(`/api/payments/${order}`);
-                const p2 = await r2.json();
-
-                if (p2.status === "pendiente") {
-                  location.reload();
-                } else {
-                  secs = 5; // sigue intentando
-                }
+                location.reload(); // Recarga para volver a mostrar los datos de transferencia
               }
             }, 1000);
-
             return;
           }
 
           /* EXPIRADO */
           if (p.status === "expirado") {
-            clearInterval(interval);
-            document.body.innerHTML = `
-              <div class="confirmado">
-                <div class="check" style="background: none;">⏰</div>
-                <h2>Pago Expirado</h2>
-                <div class="grid-datos">
-                  <div>Monto</div><div class="dato">$${p.amount}</div>
-                  <div>ID Orden</div><div class="dato">${p.orderId}</div>
-                </div>
-                <div class="footer">El link venció y no acepta más pagos.</div>
-              </div>`;
-            return;
+  clearInterval(interval);
+  document.body.innerHTML = `
+    <div class="expirado-card">
+      <div class="expire-circle">⏰</div>
+      <h2 style="color: #1b2559; margin-bottom: 5px;">Link Expirado</h2>
+      <p style="color: #a3aed0; font-size: 14px;">El tiempo para completar este pago ha finalizado.</p>
+      
+      <div class="grid-expirado">
+        <div class="dato-label">Monto</div>
+        <div class="dato-valor">$${p.amount}</div>
+        
+        <div class="dato-label">ID Orden</div>
+        <div class="dato-valor">${p.orderId}</div>
+      </div>
+      
+      <p class="footer-msg" style="margin-top: 25px;">
+        Por seguridad, este link ya no acepta transferencias. Si enviaste fondos, serán devueltos automáticamente.
+      </p>
+    </div>`;
+  return;
           }
 
           /* COMPLETADO */
           if (p.status === "completado") {
-  clearInterval(interval);
-  document.body.innerHTML = `
+            clearInterval(interval);
+            document.body.innerHTML = `
     <div class="confirmado-card">
       <div class="check-circle">✓</div>
       <h2 style="margin-bottom: 5px;">¡Pago Confirmado!</h2>
@@ -210,11 +216,11 @@
       </div>
       
       <div class="footer-msg">
-        Gracias por tu compra. Ya puedes cerrar esta ventana. [cite: 118]
+        Gracias por tu compra. Ya puedes cerrar esta ventana.
       </div>
     </div>`;
-  return;
-}
+            return;
+          }
 
           /* DATOS DEL PAGO */
           document.getElementById("monto").textContent = `$${p.amount}`;
