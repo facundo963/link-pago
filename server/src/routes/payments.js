@@ -270,7 +270,7 @@ router.post("/collection_received", async (req, res) => {
       //devolver fondos
       try {
         await axios.post(
-          `${CUCURU_BASE_URL}/Collection/reject`,
+          `${CUCURU_BASE_URL}/collection/reject`,
           {
             collection_id: data.collection_id,
             customer_account: data.customer_account,
@@ -285,12 +285,13 @@ router.post("/collection_received", async (req, res) => {
           }
         );
         console.log("✅ Devolución automática realizada con éxito.");
-      } catch {err} {
+      } catch {error} {
         console.error(
           " Cucuru rechazo el pedido de devolución automática:",
-          err.response?.data || err.message
+          error.response?.data || error.message
         );
       }
+    
 
       // Reactivar en 10s
       setTimeout(async () => {
@@ -332,8 +333,10 @@ router.post("/collection_received", async (req, res) => {
           },
         }
       );
-    } catch (err) {}
-  } catch (err) {
+    } catch (error) {
+      console.error("No se pudo bloquear el cvu post-pago");
+    }
+  } catch (error) {
     console.error("❌ Error procesando webhook:", err.message);
   }
 });
