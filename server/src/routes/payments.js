@@ -6,8 +6,7 @@ const crypto = require("crypto");
 const axios = require("axios");
 
 // URL base por si no está en .env
-const CUCURU_BASE_URL =
-  process.env.CUCURU_BASE_URL || "https://api.cucuru.com/app/v1";
+const CUCURU_BASE_URL = process.env.CUCURU_BASE_URL || "https://api.cucuru.com/app/v1";
 
 /* -----------------------------------------------------------
    1) CREAR LINK DE PAGO + CVU + ALIAS
@@ -254,19 +253,21 @@ router.post("/collection_received", async (req, res) => {
 
     const client = await Client.findById(payment.merchantId);
     if (!client) {
-      console.error("⚠️ No se encontró el comercio del pago");
+      console.error("No se encontró el comercio del pago");
       return;
     }
 
     const montoEsperado = Number(payment.amount);
     const montoRecibido = Number(data.amount);
 
-    // ❌ MONTO INCORRECTO
+    //  MONTO INCORRECTO
     if (Math.abs(montoEsperado - montoRecibido) > 0.0001) {
       payment.status = "rechazado";
       payment.motivoRechazo = `Monto incorrecto: esperado ${montoEsperado}, recibido ${montoRecibido}`;
       await payment.save();
+      console.log(`Iniciando devolución automática para cobro ID: ${data.collection_id}`);
 
+      //devolver fondos
       try {
         await axios.post(
           `${CUCURU_BASE_URL}/Collection/reject`,
@@ -283,7 +284,13 @@ router.post("/collection_received", async (req, res) => {
             },
           }
         );
-      } catch {}
+        console.log("✅ Devolución automática realizada con éxito.");
+      } catch {err} {
+        console.error(
+          " Cucuru rechazo el pedido de devolución automática:",
+          err.response?.data || err.message
+        );
+      }
 
       // Reactivar en 10s
       setTimeout(async () => {
@@ -307,6 +314,7 @@ router.post("/collection_received", async (req, res) => {
     };
     await payment.save();
 
+    // CERRAR CVU
     try {
       await axios.post(
         `${CUCURU_BASE_URL}/collection/accounts/account`,

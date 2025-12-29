@@ -266,7 +266,7 @@ h2 {
 .cancel-circle {
   width: 80px;
   height: 80px;
-  background: #a3aed0; /* Gris para indicar inactividad */
+  background: none; /* Gris para indicar inactividad */
   color: white;
   font-size: 40px;
   border-radius: 50%;
@@ -283,8 +283,9 @@ h2 {
   text-align: left;
   margin-top: 25px;
   padding: 20px;
-  background: #f8fafc;
+  background: #fffdf5;
   border-radius: 16px;
+  border: 1px solid #f4f3f0;
 }
 
 /* --- ESTADO EXPIRADO --- */
@@ -303,7 +304,7 @@ h2 {
 .expire-circle {
   width: 80px;
   height: 80px;
-  background: #ffb547; /* Tu color de warning */
+  background: none; /* Tu color de warning */
   color: white;
   font-size: 40px;
   border-radius: 50%;
