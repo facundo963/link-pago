@@ -50,10 +50,10 @@ router.post("/", async (req, res) => {
       );
       accountNumber = cvuRes.data?.account_number;
       console.log("✅ CVU creado:", accountNumber);
-    } catch (err) {
+    } catch (error) {
       console.error(
         "❌ Error creando CVU:",
-        err.response?.data || err.message
+        error.response?.data || error.message
       );
       return res.status(500).json({ error: "No se pudo crear el CVU" });
     }
@@ -72,10 +72,10 @@ router.post("/", async (req, res) => {
         }
       );
       console.log("✅ Alias asignado:", aliasPersonalizado);
-    } catch (err) {
+    } catch (error) {
       console.error(
         "⚠️ Error asignando alias:",
-        err.response?.data || err.message
+        error.response?.data || error.message
       );
     }
 
@@ -152,10 +152,10 @@ router.get("/all", async (req, res) => {
           }
         );
         console.log(`⏰🔒 CVU ${p.orderId} cerrado por vencimiento`);
-      } catch (err) {
+      } catch (error) {
         console.error(
           "❌ Error cerrando CVU:",
-          err.response?.data || err.message
+          error.response?.data || error.message
         );
       }
 
@@ -163,9 +163,9 @@ router.get("/all", async (req, res) => {
     }
 
     res.json(payments);
-  } catch (err) {
-    console.error("❌ Error listando pagos:", err);
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    console.error("❌ Error listando pagos:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -212,7 +212,7 @@ router.get("/:orderId", async (req, res) => {
             },
           }
         );
-      } catch (err) {
+      } catch (error) {
         console.error(
           "❌ Error cerrando CVU:",
           err.response?.data || err.message
@@ -223,7 +223,7 @@ router.get("/:orderId", async (req, res) => {
     }
 
     res.json(payment);
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ error: "Error obteniendo pago" });
   }
 });
@@ -383,7 +383,9 @@ router.post("/:orderId/cancel", async (req, res) => {
           },
         }
       );
-    } catch (err) {}
+    } catch (error) {
+
+    }
 
     payment.status = "cancelado";
     payment.paymentInfo.bloqueado = true;
