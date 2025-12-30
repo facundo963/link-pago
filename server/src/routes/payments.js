@@ -312,8 +312,9 @@ router.post("/collection_received", async (req, res) => {
       banco: data.customer_bank_name || "Desconocido",
     };
     await payment.save();
-    console.log(`✅ Pago ${payment.orderId} completado por $${montoRecibido}`);
+    console.log(`✅ Pago ${payment.orderId} completado por $${montoRecibido}`)
 
+    // Cerrar CVU
     try {
       await axios.post(
         `${CUCURU_BASE_URL}/collection/accounts/account`,

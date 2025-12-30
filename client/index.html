@@ -113,7 +113,7 @@
        ============================= -->
   <script>
   const API = '/api/payments';
-  const MERCHANT_ID = merchantId = localStorage.getItem('merchantId');
+  const getMerchantId = () => localStorage.getItem('merchantId');
 
   document.getElementById('create-link').onclick = () => {
     const form = document.getElementById('form');
@@ -212,6 +212,8 @@
   }
 
   async function loadList() {
+    const currentId = getMerchantId();
+    if (!currentId) return;
     const res = await fetch(API + '/all?merchantId=' + MERCHANT_ID);
     const arr = await res.json();
     const table = document.getElementById('list');
@@ -356,10 +358,10 @@ document.getElementById("cfg-save").onclick = async () => {
     localStorage.setItem("cfg_apiKey", cucuruApiKey);
     localStorage.setItem("cfg_collectorId", cucuruCollectorId);
     localStorage.setItem("cfg_aliasPrefix", aliasPrefix);
-    window.merchantId = json._id;
+    
 
+    document.getElementById("config-panel").style.display = "none";
     showNotice("✅ Configuración guardada");
-    document.getElementById("config-panel").classList.remove("open");
   } else {
     showAdvertencia("❌ Error guardando configuración");
   }
