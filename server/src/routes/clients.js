@@ -28,11 +28,28 @@ async function registrarWebhook(client) {
   }
 }
 
-// Crear cliente nuevo y avisar a Cucuru
+// Crear cliente y registrar webhook automáticamente
 router.post("/", async (req, res) => {
-  const client = await Client.create(req.body);
+  try {
+    const {cucuruCollectorId, cucuruApiKey, aliasPrefix} = req.body;
+    let client = await Client.findOne({ cucuruCollectorId });
+    if (client) {
+      client.cucuruApiKey = cucuruApiKey;
+      client.aliasPrefix = aliasPrefix;
+      client.name = cucuruCollectorId; // Mantener nombre sincronizado
+      await client.save();
+      console.log(`🔄 Cliente actualizado (mismo ID): ${client._id}`);
+  }else{
+    client = await Client.create(req.body);
+    console.log(`✅ Cliente creado: ${client._id}`);
+  }
+
   await registrarWebhook(client); // <--- Registro automático
   res.json(client);
+  } catch (err) {
+    console.error("❌ Error creando cliente:", err);
+    res.status(500).json({ error: "Error al procesar la configuracion" });
+  }
 });
 
 // Actualizar cliente y re-registrar (por si cambió la API Key)
