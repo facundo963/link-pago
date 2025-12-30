@@ -268,24 +268,28 @@ router.post("/collection_received", async (req, res) => {
       await payment.save();
 
       //devolver dinero
-      try {
-        await axios.post(
-          `${CUCURU_BASE_URL}/Collection/reject`,
-          {
+      try 
+          
+        {
+          const rejectBody = {
             collection_id: data.collection_id,
             customer_account: data.customer_account,
             collection_account: data.collection_account,
-          },
+          };
+          
+           await axios.post(`${CUCURU_BASE_URL}/Collection/reject`, rejectBody,
           {
             headers: {
               "X-Cucuru-Api-Key": client.cucuruApiKey,
               "X-Cucuru-Collector-Id": client.cucuruCollectorId,
               "Content-Type": "application/json",
             },
-          }
-        );
+          });
+          
         console.log("Pago devuelto por monto incorrecto");
-      } catch {}
+      } catch(err) {
+        console.error("❌ Error devolviendo pago:", err.response?.data || err.message);
+      }
 
       // Reactivar en 10s
       setTimeout(async () => {
