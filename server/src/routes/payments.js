@@ -277,7 +277,7 @@ router.post("/collection_received", async (req, res) => {
             collection_account: data.collection_account,
           };
           
-           await axios.post(`${CUCURU_BASE_URL}/Collection/reject`, rejectBody,
+           await axios.post(`${CUCURU_BASE_URL}/collection/reject`, rejectBody,
           {
             headers: {
               "X-Cucuru-Api-Key": client.cucuruApiKey,
@@ -285,7 +285,7 @@ router.post("/collection_received", async (req, res) => {
               "Content-Type": "application/json",
             },
           });
-          
+
         console.log("Pago devuelto por monto incorrecto");
       } catch(err) {
         console.error("❌ Error devolviendo pago:", err.response?.data || err.message);
