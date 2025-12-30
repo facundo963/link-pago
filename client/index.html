@@ -122,6 +122,11 @@
 
   document.getElementById('create').onclick = async () => {
     const btn = document.getElementById('create');
+    const mId = getMerchantId();
+    if (!mId) {
+      showAdvertencia('⚠️ Configure su API Key en Configuracion');
+      return;
+    }
     btn.disabled = true;
     btn.textContent = 'Creando Link de pago...';
 
@@ -145,7 +150,7 @@
         description: desc,
         customerEmail: email,
         expiresInHours: hours,
-        merchantId: MERCHANT_ID
+        merchantId: mId
       })
     });
 
@@ -211,12 +216,17 @@
     setTimeout(() => notice.style.display = 'none', 4000);
   }
 
+  // Cargar lista de pagos
   async function loadList() {
-    const currentId = getMerchantId();
-    if (!currentId) return;
-    const res = await fetch(API + '/all?merchantId=' + MERCHANT_ID);
-    const arr = await res.json();
-    const table = document.getElementById('list');
+    const mId = getMerchantId();
+    if (!mId) return;
+    
+    try{
+      const res = await fetch(`${API}/all?merchantId=${mId}`);
+      const arr = await res.json();
+      const table = document.getElementById('list'); 
+    
+    
     table.innerHTML = `
       <tr>
         <th>Estado</th>
@@ -260,6 +270,9 @@
         setTimeout(() => btn.textContent = '📋', 1600);
       };
     });
+  } catch(err) {
+    showAdvertencia('⚠️ Error cargando lista de pagos.', err);
+  }
   }
 
   let cancelOrderId = null;
@@ -323,9 +336,9 @@ function loadConfig() {
   document.getElementById("cfg-prefix").value =
     localStorage.getItem("cfg_aliasPrefix") || "";
 }
-
 loadConfig();
 
+// Guardar configuración
 document.getElementById("cfg-save").onclick = async () => {
   const cucuruApiKey = document.getElementById("cfg-api").value.trim();
   const cucuruCollectorId = document.getElementById("cfg-collector").value.trim();
@@ -366,7 +379,6 @@ document.getElementById("cfg-save").onclick = async () => {
     showAdvertencia("❌ Error guardando configuración");
   }
 };
-  
   loadList();
 </script>
 
