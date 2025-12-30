@@ -215,7 +215,7 @@ router.get("/:orderId", async (req, res) => {
       } catch (error) {
         console.error(
           "❌ Error cerrando CVU:",
-          err.response?.data || err.message
+          error.response?.data || error.message
         );
       }
 
@@ -337,7 +337,7 @@ router.post("/collection_received", async (req, res) => {
       console.error("No se pudo bloquear el cvu post-pago");
     }
   } catch (error) {
-    console.error("❌ Error procesando webhook:", err.message);
+    console.error("❌ Error procesando webhook:", error.message);
   }
 });
 
