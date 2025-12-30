@@ -383,10 +383,14 @@ router.post("/:orderId/cancel", async (req, res) => {
           },
         }
       );
-    } catch (error) {
-
+    } catch(error) {
+      console.error(
+        "❌ Error cerrando CVU:",
+        error.response?.data || error.message
+      );
     }
-
+      
+  
     payment.status = "cancelado";
     payment.paymentInfo.bloqueado = true;
     payment.paymentInfo.cerradoEn = new Date();
@@ -397,7 +401,7 @@ router.post("/:orderId/cancel", async (req, res) => {
       message: "Link cancelado y CVU bloqueado.",
       payment,
     });
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ error: "Error cancelando link" });
   }
 });
